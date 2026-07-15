@@ -1,0 +1,24 @@
+# Directories to ignore
+__pycache__/
+models/
+recordings/
+transcripts/
+moms/
+stream/
+
+# Files to ignore
+*.bin
+*.pt
+*.exe
+*.dll
+*.log
+*.zip
+*.tar.gz
+
+.git_backup/
+
+# Environment - secrets (never share .env, only .env.example)
+.env
+
+whisper/
+

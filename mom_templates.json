@@ -1,0 +1,32 @@
+{
+  "standard": {
+    "name": "Standard MOM",
+    "description": "Concise minutes with bullet points and participants",
+    "prompt": "Generate a concise MOM STRICTLY in this format (be brief):\n\n**DATE:** {date}\n\n**PARTICIPANTS:**\n- [List each participant]\n\n**KEY DISCUSSION POINTS:**\n- [Point 1]\n- [Point 2]\n- [Point 3]\n\n**ACTION ITEMS:**\n- [Action] - Owner: [Name]\n\n**DECISIONS MADE:**\n- [Decision 1]\n\nTranscript: {transcript}\n\nKeep it concise. Extract only essential information."
+  },
+  "executive": {
+    "name": "Executive Summary",
+    "description": "High-level summary with bullet points and participants",
+    "prompt": "Generate executive summary STRICTLY in this format (be concise):\n\n**DATE:** {date}\n\n**PARTICIPANTS:**\n- [List participants]\n\n**KEY DECISIONS:**\n- [Decision 1]\n- [Decision 2]\n\n**CRITICAL ACTION ITEMS:**\n- [Action] - Owner: [Name]\n\nTranscript: {transcript}\n\nFocus on executive-level decisions and impacts only."
+  },
+  "technical": {
+    "name": "Technical Discussion",
+    "description": "Technical meeting minutes with bullet points and participants",
+    "prompt": "Generate technical meeting minutes STRICTLY in this format (be brief):\n\n**DATE:** {date}\n\n**PARTICIPANTS:**\n- [List participants]\n\n**TECHNICAL TOPICS:**\n- [Topic 1]\n- [Topic 2]\n\n**DECISIONS:**\n- [Decision 1]\n- [Decision 2]\n\n**ACTION ITEMS:**\n- [Task] - Owner: [Name]\n\nTranscript: {transcript}\n\nFocus on technical accuracy and actionability."
+  },
+  "agile": {
+    "name": "Agile Standup",
+    "description": "Agile standup format with participants and bullet points",
+    "prompt": "Generate Agile standup minutes STRICTLY in this format (be concise):\n\n**DATE:** {date}\n\n**PARTICIPANTS:**\n- [List participants]\n\n**YESTERDAY ACCOMPLISHED:**\n- [Task 1]\n- [Task 2]\n\n**TODAY'S PLAN:**\n- [Task 1]\n- [Task 2]\n\n**BLOCKERS:**\n- [Blocker 1]\n\nTranscript: {transcript}\n\nKeep concise with clear action items."
+  },
+  "client": {
+    "name": "Client Meeting",
+    "description": "Client-facing meeting format with participants and bullet points",
+    "prompt": "Generate client-appropriate minutes STRICTLY in this format (be professional but brief):\n\n**DATE:** {date}\n\n**PARTICIPANTS:**\n- [List participants]\n\n**MEETING OBJECTIVE:**\n- [Objective]\n\n**CLIENT FEEDBACK:**\n- [Feedback 1]\n- [Feedback 2]\n\n**NEXT STEPS:**\n- [Step 1]\n- [Step 2]\n\nTranscript: {transcript}\n\nMaintain professional tone. Focus on outcomes."
+  },
+  "legal": {
+    "name": "Legal/Compliance",
+    "description": "Formal legal/compliance minutes with participants and bullet points",
+    "prompt": "Generate legal meeting minutes STRICTLY in this format (be formal but concise):\n\n**DATE:** {date}\n\n**PARTICIPANTS:**\n- [List participants]\n\n**AGREEMENTS:**\n- [Agreement 1]\n- [Agreement 2]\n\n**LEGAL COMMITMENTS:**\n- [Commitment 1]\n\n**FOLLOW-UP REQUIREMENTS:**\n- [Requirement] - Owner: [Name]\n\nTranscript: {transcript}\n\nMaintain formal legal language. Extract key commitments only."
+  }
+}

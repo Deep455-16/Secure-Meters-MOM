@@ -1,0 +1,32 @@
+# ============================================================
+# MOM Generator - Complete Requirements
+# ============================================================
+
+# --- Web Framework ---
+flask>=3.0.0
+flask-cors>=4.0.0
+flask-socketio>=5.3.0
+eventlet>=0.35.0         # Async worker for Socket.IO real-time streaming
+
+# --- HTTP Client ---
+requests>=2.28.0
+
+# --- Speech-to-Text (Faster Whisper) ---
+faster-whisper>=1.0.0    # Distilled Whisper models via CTranslate2
+ctranslate2>=4.0.0       # Optimized inference engine for faster-whisper
+huggingface-hub>=0.23.0  # Model download from HuggingFace
+
+# --- Audio Processing ---
+numpy>=1.24.0            # PCM audio array handling
+torch>=2.0.0             # Required by silero-vad
+torchaudio>=2.0.0        # Audio utilities for VAD
+silero-vad>=5.1.2        # Voice Activity Detection
+imageio-ffmpeg>=0.5.1    # Provides portable ffmpeg binary for duration & splitting
+
+# --- Document Export ---
+python-docx>=1.1.0       # DOCX export
+fpdf2>=2.7.0             # PDF export
+
+# --- LLM API Clients (for cloud deployment) ---
+openai>=1.0.0            # OpenAI-compatible client (works with Groq & Together AI too)
+groq>=0.9.0              # Groq cloud LLM API

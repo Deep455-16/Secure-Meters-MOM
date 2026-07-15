@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MOM Generator Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    /* ─── CSS Custom Properties ─────────────────────────────────────── */
+    :root {
+      --primary:        #1F3864;
+      --primary-light:  #2a4d8f;
+      --primary-dark:   #152847;
+      --accent:         #E8A020;
+      --accent-light:   #f5b93a;
+      --accent-dark:    #c9871a;
+
+      --bg:             #f0f4f8;
+      --bg-secondary:   #e2e8f0;
+      --card-bg:        rgba(255, 255, 255, 0.82);
+      --card-border:    rgba(31, 56, 100, 0.12);
+      --card-shadow:    0 8px 32px rgba(31, 56, 100, 0.10);
+
+      --text:           #1a2236;
+      --text-muted:     #64748b;
+      --text-light:     #94a3b8;
+
+      --topbar-bg:      rgba(255, 255, 255, 0.72);
+      --topbar-border:  rgba(31, 56, 100, 0.10);
+
+      --input-bg:       rgba(255,255,255,0.9);
+      --input-border:   rgba(31, 56, 100, 0.18);
+
+      --success:        #10b981;
+      --warning:        #f59e0b;
+      --danger:         #ef4444;
+      --info:           #3b82f6;
+
+      --radius-sm:      8px;
+      --radius:         14px;
+      --radius-lg:      20px;
+      --radius-xl:      28px;
+
+      --transition:     all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg:             #0d1526;
+      --bg-secondary:   #111d35;
+      --card-bg:        rgba(20, 35, 70, 0.72);
+      --card-border:    rgba(232, 160, 32, 0.12);
+      --card-shadow:    0 8px 32px rgba(0, 0, 0, 0.40);
+
+      --text:           #e8edf5;
+      --text-muted:     #94a3b8;
+      --text-light:     #64748b;
+
+      --topbar-bg:      rgba(13, 21, 38, 0.88);
+      --topbar-border:  rgba(232, 160, 32, 0.10);
+
+      --input-bg:       rgba(20, 35, 70, 0.80);
+      --input-border:   rgba(232, 160, 32, 0.20);
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.35s ease, color 0.35s ease;
+      overflow-x: hidden;
+    }
+
+    /* ─── Animated Background ────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 10%, rgba(31,56,100,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 80%, rgba(232,160,32,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(31,56,100,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    [data-theme="dark"] body::before {
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 10%, rgba(31,56,100,0.30) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 80%, rgba(232,160,32,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(31,56,100,0.15) 0%, transparent 70%);
+    }
+
+    /* ─── Top Bar ────────────────────────────────────────────────────── */
+    #topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 24px;
+      height: 62px;
+      background: var(--topbar-bg);
+      border-bottom: 1px solid var(--topbar-border);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      transition: var(--transition);
+    }
+
+    #back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    #back-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(31,56,100,0.25);
+    }
+    #back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .topbar-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    .topbar-title .brand {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.2px;
+    }
+    [data-theme="dark"] .topbar-title .brand { color: var(--accent); }
+
+    .topbar-title .sep {
+      width: 1px;
+      height: 18px;
+      background: var(--card-border);
+      flex-shrink: 0;
+    }
+    .topbar-title .page-name {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    /* Theme Toggle */
+    #theme-toggle {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      background: var(--bg-secondary);
+      border: 1.5px solid var(--card-border);
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+    #theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      transition: var(--transition);
+    }
+    [data-theme="dark"] #theme-toggle::after {
+      left: calc(100% - 23px);
+      background: var(--accent);
+    }
+    .theme-icon {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
+      pointer-events: none;
+    }
+    .theme-icon svg { width: 12px; height: 12px; }
+
+    /* ─── Main Layout ────────────────────────────────────────────────── */
+    .main-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ─── Page Header ────────────────────────────────────────────────── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .page-header-inner {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .page-icon-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(31,56,100,0.30);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-icon-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+      border-radius: 50%;
+    }
+    .page-icon-wrap svg { width: 30px; height: 30px; color: #fff; position: relative; z-index: 1; }
+
+    .page-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+    [data-theme="dark"] .page-title {
+      background: linear-gradient(135deg, #7aa3e0 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .page-subtitle {
+      font-size: 14.5px;
+      color: var(--text-muted);
+      max-width: 420px;
+      line-height: 1.5;
+    }
+
+    
+
+    /* Specific Settings Styles */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 30px; }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 25px; box-shadow: var(--card-shadow); transition: transform 0.2s, box-shadow 0.2s; }
+    .card h2 { font-size: 1.3rem; margin-bottom: 15px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+    .card p { color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6; }
+    
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--text); font-size: 0.9rem; }
+    .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; background: var(--input-bg); color: var(--text); font-size: 0.95rem; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232, 160, 32, 0.1); }
+    
+    .slider-container { display: flex; align-items: center; gap: 15px; }
+    input[type="range"] { flex: 1; height: 6px; border-radius: 3px; background: var(--card-border); outline: none; -webkit-appearance: none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .slider-value { min-width: 80px; text-align: center; font-weight: 600; color: var(--primary); background: rgba(31, 56, 100, 0.1); padding: 8px 12px; border-radius: 6px; }
+    
+    .toggle-switch { display: flex; align-items: center; gap: 15px; }
+    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--text-light); transition: .3s; border-radius: 28px; }
+    .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--success); }
+    input:checked + .slider:before { transform: translateX(22px); }
+    
+    .button-group { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+    .btn-secondary { padding: 12px 20px; border: 1px solid var(--card-border); border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; background: var(--card-bg); color: var(--text); font-size: 0.95rem; }
+    .btn-secondary:hover { border-color: var(--accent); }
+    
+    .status-message { padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 15px; font-size: 0.9rem; display: none; align-items: center; gap: 10px; position: fixed; bottom: 20px; right: 20px; z-index: 1000; box-shadow: var(--card-shadow); }
+    .status-message.show { display: flex; }
+    .status-success { background: var(--success); color: white; }
+    .status-error { background: var(--danger); color: white; }
+    .status-info { background: var(--primary); color: white; }
+    
+    .info-box { background: rgba(31, 56, 100, 0.05); border-left: 4px solid var(--accent); padding: 15px; border-radius: 6px; font-size: 0.85rem; color: var(--text-muted); margin-top: 15px; }
+    .divider { height: 1px; background: var(--card-border); margin: 25px 0; }
+    .section-title { font-size: 1.1rem; font-weight: 600; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 15px; }
+    .stat-item { background: rgba(31, 56, 100, 0.05); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid var(--card-border); }
+    .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
+    .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+    
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    
+    .footer { text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.85rem; margin-top: 40px; }
+    [data-theme="dark"] .stat-value { color: var(--accent); }
+    [data-theme="dark"] .card h2 { color: var(--accent); }
+    [data-theme="dark"] .slider-value { color: var(--accent); }
+</style>
+</head>
+<body>
+    <header id="topbar">
+    <a id="back-btn" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Back to Home
+    </a>
+
+    <div class="topbar-title">
+      <div class="sep"></div>
+      <span class="page-name">Settings</span>
+    </div>
+
+    <div class="topbar-right">
+      <button id="theme-toggle" aria-label="Toggle theme" title="Toggle dark/light mode" onclick="toggleTheme()">
+        <span class="theme-icon">
+          <!-- Sun -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <!-- Moon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </header>
+  <main class="main-wrap">
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="page-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+        <h1 class="page-title">Settings</h1>
+        <p class="page-subtitle">Customize your MOM Generator experience</p>
+      </div>
+    </div>
+<div id="statusMessage" class="status-message"></div>
+<div class="grid">
+            <!-- Theme Settings -->
+            <div class="card">
+                <h2>🎨 Theme & Appearance</h2>
+                <p>Customize the look and feel of the application</p>
+                
+                <div class="form-group">
+                    <label>Color Theme</label>
+                    <select id="themeSelect" onchange="updateTheme()">
+                        <option value="light">☀️ Light Mode</option>
+                        <option value="dark">🌙 Dark Mode</option>
+                        <option value="auto">🔄 Auto (System Preference)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Enable Animations</label>
+                        <label class="switch">
+                            <input type="checkbox" id="animationsToggle" onchange="updateSetting('animations', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Compact Mode</label>
+                        <label class="switch">
+                            <input type="checkbox" id="compactToggle" onchange="updateSetting('compact', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    ℹ️ Changes apply immediately to all pages
+                </div>
+            </div>
+            
+            <!-- Audio Settings -->
+            <div class="card">
+                <h2>🎙️ Audio Settings</h2>
+                <p>Control audio upload and recording parameters</p>
+                
+                <div class="section-title">📏 Max Audio Length</div>
+                <div class="form-group">
+                    <div class="slider-container">
+                        <input type="range" id="audioLengthSlider" min="1" max="180" value="180" 
+                               oninput="updateAudioLimit(this.value)">
+                        <span class="slider-value"><span id="audioLengthValue">180</span> min</span>
+                    </div>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;">
+                    Recommended: 30-60 minutes
+                </p>
+                
+                <div class="form-group">
+                    <label>Supported Audio Formats</label>
+                    <div class="info-box" style="border-left: none; background: rgba(79, 70, 229, 0.05);">
+                        ✓ WAV, MP3, M4A, MP4 (video), OGG, AAC, FLAC
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">7</div>
+                        <div class="stat-label">Formats</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">180</div>
+                        <div class="stat-label">Max Min</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Text Settings -->
+            <div class="card">
+                <h2>📝 Text Settings</h2>
+                <p>Manage text transcript input limits</p>
+                
+                <div class="section-title">📊 Max Transcript Length</div>
+                <div class="form-group">
+                    <div class="slider-container">
+                        <input type="range" id="textLengthSlider" min="100" max="1000000" step="1000" value="1000000"
+                               oninput="updateTextLimit(this.value)">
+                        <span class="slider-value"><span id="textLengthValue">1000000</span> chars</span>
+                    </div>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;">
+                    Recommended: 10,000–100,000 characters. Maximum: 1,000,000
+                </p>
+                
+                <div class="divider"></div>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Auto-format Text</label>
+                        <label class="switch">
+                            <input type="checkbox" id="autoFormatToggle" onchange="updateSetting('autoFormat', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">1M</div>
+                        <div class="stat-label">Max Char</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">~10K</div>
+                        <div class="stat-label">Typical</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Generation Settings -->
+            <div class="card">
+                <h2>⚡ Generation Settings</h2>
+                <p>Configure MOM generation behavior</p>
+                
+                <div class="form-group">
+                    <label>Default MOM Format</label>
+                    <select id="defaultFormatSelect" onchange="updateSetting('defaultFormat', this.value)">
+                        <option value="standard">Standard (Concise Summary)</option>
+                        <option value="executive">Executive (High-level)</option>
+                        <option value="agile">Agile (Standup Format)</option>
+                        <option value="technical">Technical (Engineering)</option>
+                        <option value="client">Client (Professional)</option>
+                        <option value="legal">Legal (Compliance)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Auto-generate on Upload</label>
+                        <label class="switch">
+                            <input type="checkbox" id="autoGenerateToggle" onchange="updateSetting('autoGenerate', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Show Generation Timer</label>
+                        <label class="switch">
+                            <input type="checkbox" id="timerToggle" checked onchange="updateSetting('showTimer', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    ℹ️ Format determines MOM structure and content focus
+                </div>
+            </div>
+            
+            <!-- MOM Settings -->
+            <div class="card">
+                <h2>📄 MOM Settings</h2>
+                <p>Configure Minutes of Meeting generation parameters</p>
+                
+                <div class="section-title">🔤 MOM Word Limit</div>
+                <div class="form-group">
+                    <div class="slider-container">
+                        <input type="range" id="momWordLimitSlider" min="50" max="1000" step="50" value="500"
+                               oninput="updateMomWordLimit(this.value)">
+                        <span class="slider-value"><span id="momWordLimitValue">500</span> words</span>
+                    </div>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;">
+                    Recommended: 200-500 words. Min: 50, Max: 1000
+                </p>
+                
+                <div class="divider"></div>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Include Timestamps</label>
+                        <label class="switch">
+                            <input type="checkbox" id="includeTimestampsToggle" checked onchange="updateSetting('includeTimestamps', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Include Action Items</label>
+                        <label class="switch">
+                            <input type="checkbox" id="includeActionItemsToggle" checked onchange="updateSetting('includeActionItems', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    ℹ️ Word limit enforced during MOM generation
+                </div>
+            </div>
+            
+            <!-- Server Configuration -->
+            <div class="card">
+                <h2>🖥️ Server Configuration</h2>
+                <p>Configure AI model and server settings</p>
+                
+                <div class="form-group">
+                    <label>Live Stream / Audio Model (STT)</label>
+                    <select id="sttModelSelect" onchange="updateServerConfig('stt_model', this.value)">
+                        <option value="distil-small.en">English Only (distil-small.en - Ultra Fast)</option>
+                        <option value="small">Hinglish / Multilingual (small - Standard)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Chunking Model (Fast Layer)</label>
+                    <select id="chunkingModelSelect" onchange="updateServerConfig('chunking_model', this.value)">
+                        <option value="qwen2.5:1.5b">Qwen 2.5 1.5B (⚡ Fastest - Recommended)</option>
+                        <option value="qwen2.5:3b">Qwen 2.5 3B (⚡ Fast)</option>
+                        <option value="qwen2.5:7b">Qwen 2.5 7B (Balanced)</option>
+                        <option value="qwen2.5:32b">Qwen 2.5 32B (High Quality)</option>
+                        <option value="mistral:latest">Mistral Latest</option>
+                        <option value="llama2:latest">Llama 2 Latest</option>
+                        <option value="llama3:latest">Llama 3 Latest</option>
+                    </select>
+                    <p style="font-size: 0.85rem; color: var(--success); margin-top: 5px; font-weight: 500;">
+                        ✓ Current: <span id="currentChunkingModelDisplay">Loading...</span>
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label>Ollama Model (Refinement Layer)</label>
+                    <select id="ollamaModelSelect" onchange="updateServerConfig('ollama_model', this.value)">
+                        <option value="qwen2.5:1.5b">Qwen 2.5 1.5B (⚡ Fastest)</option>
+                        <option value="qwen2.5:3b">Qwen 2.5 3B (⚡ Fast)</option>
+                        <option value="qwen2.5:7b" selected>Qwen 2.5 7B (Balanced - Recommended)</option>
+                        <option value="qwen2.5:32b">Qwen 2.5 32B (High Quality)</option>
+                        <option value="mistral:latest">Mistral Latest</option>
+                        <option value="llama2:latest">Llama 2 Latest</option>
+                        <option value="llama3:latest">Llama 3 Latest</option>
+                    </select>
+                    <p style="font-size: 0.85rem; color: var(--success); margin-top: 5px; font-weight: 500;">
+                        ✓ Current: <span id="currentModelDisplay">Loading...</span>
+                    </p>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="form-group">
+                    <label>Ollama Server URL</label>
+                    <input type="text" id="ollamaUrlInput" placeholder="http://localhost:11434"
+                           onchange="updateServerConfig('ollama_url', this.value)">
+                </div>
+                
+                <div class="form-group">
+                    <label>Whisper Executable</label>
+                    <input type="text" id="whisperExeInput" placeholder="main.exe"
+                           onchange="updateServerConfig('whisper_exe', this.value)">
+                </div>
+                
+                <div class="form-group">
+                    <label>Whisper Model Path</label>
+                    <input type="text" id="whisperModelInput" placeholder="models/ggml-medium.bin"
+                           onchange="updateServerConfig('whisper_model', this.value)">
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="testOllamaConnection()">🧪 Test Ollama Connection</button>
+                    <button class="btn-secondary" onclick="listAvailableModels()">📋 List Available Models</button>
+                </div>
+                
+                <div class="info-box">
+                    ℹ️ Changes require page refresh to take effect. Qwen 2.5 1.5B is recommended for speed and efficiency
+                </div>
+            </div>
+            
+            <!-- Teams Integration -->
+            <div class="card">
+                <h2>🔗 Microsoft Teams Integration</h2>
+                <p>Connect Microsoft Teams to automatically fetch meetings</p>
+                
+                <div class="form-group">
+                    <label>Teams API Key</label>
+                    <input type="password" id="teamsApiKeyInput" placeholder="Enter your Teams API key"
+                           onchange="updateSetting('teamsApiKey', this.value)">
+                    <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 5px;">
+                        🔐 API keys are encrypted and stored locally
+                    </p>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tenant ID</label>
+                    <input type="text" id="tenantIdInput" placeholder="Your Azure AD Tenant ID"
+                           onchange="updateSetting('tenanttId', this.value)">
+                </div>
+                
+                <div class="form-group">
+                    <label>Client ID</label>
+                    <input type="text" id="clientIdInput" placeholder="Your Azure AD Client ID"
+                           onchange="updateSetting('clientId', this.value)">
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="form-group">
+                    <label>Microsoft Teams Meeting Link</label>
+                    <input type="text" id="meetingLinkInput" placeholder="Paste Teams meeting link (https://teams.microsoft.com/...)"
+                           onchange="updateSetting('meetingLink', this.value)">
+                </div>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Auto-fetch from Teams</label>
+                        <label class="switch">
+                            <input type="checkbox" id="autoFetchTeamsToggle" onchange="updateSetting('autoFetchTeams', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="button-group" style="gap: 10px;">
+                    <button class="btn-secondary" onclick="testTeamsConnection()">🧪 Test Connection</button>
+                    <button class="btn-secondary" onclick="fetchTeamsMeetings()">📥 Fetch Meetings</button>
+                </div>
+                
+                <div class="info-box">
+                    ℹ️ All credentials stored securely on localhost only
+                </div>
+            </div>
+            
+            <!-- Data Privacy -->
+            <div class="card">
+                <h2>🔒 Data Privacy & Security</h2>
+                <p>Ensure your meeting data stays private and secure</p>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Local Storage Only</label>
+                        <label class="switch">
+                            <input type="checkbox" id="localStorageOnlyToggle" checked onchange="updateSetting('localStorageOnly', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--success); margin-top: 5px; font-weight: 500;">
+                    ✓ All MP4/audio files stay on localhost
+                </p>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Encrypt Local Files</label>
+                        <label class="switch">
+                            <input type="checkbox" id="encryptFilesToggle" onchange="updateSetting('encryptFiles', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Auto-delete after 30 days</label>
+                        <label class="switch">
+                            <input type="checkbox" id="autoDeleteToggle" onchange="updateSetting('autoDelete', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="form-group">
+                    <label>Storage Location</label>
+                    <div class="info-box" style="border-left: none; background: rgba(16, 185, 129, 0.05);">
+                        📁 <span id="storageLocationDisplay">recordings/</span>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="clearAllData()">🗑️ Clear All Data</button>
+                    <button class="btn-secondary" onclick="showStorageInfo()">📊 Storage Info</button>
+                </div>
+                
+                <div class="info-box" style="margin-top: 15px; border-left-color: #10B981;">
+                    🛡️ Whisper.cpp + Ollama integration ensures zero cloud data leakage
+                </div>
+            </div>
+            
+            <!-- Notification Settings -->
+            <div class="card">
+                <h2>🔔 Notifications</h2>
+                <p>Control how you receive alerts and updates</p>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Browser Notifications</label>
+                        <label class="switch">
+                            <input type="checkbox" id="browserNotifyToggle" checked onchange="updateSetting('browserNotify', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Sound Alerts</label>
+                        <label class="switch">
+                            <input type="checkbox" id="soundToggle" checked onchange="updateSetting('soundAlerts', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Notification Level</label>
+                    <select id="notificationLevelSelect" onchange="updateSetting('notificationLevel', this.value)">
+                        <option value="all">All Notifications</option>
+                        <option value="important">Important Only</option>
+                        <option value="errors">Errors Only</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="testNotification()">📢 Test Notification</button>
+                </div>
+            </div>
+            
+            <!-- System Information -->
+            <div class="card">
+                <h2>ℹ️ System Information</h2>
+                <p>View application and system details</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">App Version</div>
+                        <div class="stat-value" style="font-size: 1rem;">2.0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Status</div>
+                        <div class="badge badge-success" style="margin-top: 5px;">Active</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Browser</div>
+                        <div class="stat-value" style="font-size: 0.9rem;" id="browserName">Loading...</div>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <label>Enable Debug Mode</label>
+                        <label class="switch">
+                            <input type="checkbox" id="debugToggle" onchange="updateSetting('debug', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="exportSettings()">📥 Export Settings</button>
+                    <button class="btn-secondary" onclick="clearCache()">🗑️ Clear Cache</button>
+                </div>
+            </div>
+        </div>
+        
+        <div style="display: flex; justify-content: center; margin-bottom: 30px;">
+            <button class="btn-secondary" onclick="goBack()" style="padding: 12px 24px; font-size: 1rem;">
+                ← Back to Generator
+            </button>
+        </div>
+    </div>
+    
+  </main>
+
+    <div class="footer">
+        <p>MOM Generator Settings • Version 2.0 • © 2026</p>
+    </div>
+    
+    <script>
+        // Load settings on page load
+        window.addEventListener('DOMContentLoaded', loadSettings);
+        
+        // Theme detection
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('momSettings')) || getDefaultSettings();
+            
+            // Apply theme
+            const themeSelect = document.getElementById('themeSelect');
+            if (themeSelect) {
+                themeSelect.value = settings.theme || (prefersDark ? 'dark' : 'light');
+            }
+            applyTheme(settings.theme || (prefersDark ? 'dark' : 'light'));
+            
+            // Load audio limit
+            document.getElementById('audioLengthSlider').value = settings.audioMaxLength || 180;
+            updateAudioLimit(settings.audioMaxLength || 180);
+            
+            // Load text limit
+            document.getElementById('textLengthSlider').value = settings.textMaxLength || 1000000;
+            updateTextLimit(settings.textMaxLength || 1000000);
+            
+            // Load MOM word limit
+            document.getElementById('momWordLimitSlider').value = settings.momWordLimit || 500;
+            updateMomWordLimit(settings.momWordLimit || 500);
+            
+            // Load toggles
+            document.getElementById('animationsToggle').checked = settings.animations !== false;
+            document.getElementById('compactToggle').checked = settings.compact || false;
+            document.getElementById('autoFormatToggle').checked = settings.autoFormat !== false;
+            document.getElementById('autoGenerateToggle').checked = settings.autoGenerate || false;
+            document.getElementById('timerToggle').checked = settings.showTimer !== false;
+            document.getElementById('browserNotifyToggle').checked = settings.browserNotify !== false;
+            document.getElementById('soundToggle').checked = settings.soundAlerts !== false;
+            document.getElementById('debugToggle').checked = settings.debug || false;
+            
+            // Load MOM settings
+            document.getElementById('includeTimestampsToggle').checked = settings.includeTimestamps !== false;
+            document.getElementById('includeActionItemsToggle').checked = settings.includeActionItems !== false;
+            
+            // Load Teams settings
+            document.getElementById('teamsApiKeyInput').value = settings.teamsApiKey || '';
+            document.getElementById('tenantIdInput').value = settings.tenanttId || '';
+            document.getElementById('clientIdInput').value = settings.clientId || '';
+            document.getElementById('meetingLinkInput').value = settings.meetingLink || '';
+            document.getElementById('autoFetchTeamsToggle').checked = settings.autoFetchTeams || false;
+            
+            // Load Data Privacy settings
+            document.getElementById('localStorageOnlyToggle').checked = settings.localStorageOnly !== false;
+            document.getElementById('encryptFilesToggle').checked = settings.encryptFiles || false;
+            document.getElementById('autoDeleteToggle').checked = settings.autoDelete || false;
+            
+            // Load selections
+            document.getElementById('defaultFormatSelect').value = settings.defaultFormat || 'standard';
+            document.getElementById('notificationLevelSelect').value = settings.notificationLevel || 'all';
+            
+            // Set browser name
+            document.getElementById('browserName').textContent = getBrowserName();
+            
+            // Load server configuration
+            loadServerConfig();
+            
+            showStatus('✓ Settings loaded', 'success', 2000);
+        }
+        
+        function getDefaultSettings() {
+            return {
+                theme: prefersDark ? 'dark' : 'light',
+                audioMaxLength: 180,
+                textMaxLength: 1000000,
+                momWordLimit: 500,
+                animations: true,
+                compact: false,
+                autoFormat: true,
+                autoGenerate: false,
+                showTimer: true,
+                browserNotify: true,
+                soundAlerts: true,
+                notificationLevel: 'all',
+                defaultFormat: 'standard',
+                debug: false,
+                includeTimestamps: true,
+                includeActionItems: true,
+                teamsApiKey: '',
+                tenanttId: '',
+                clientId: '',
+                meetingLink: '',
+                autoFetchTeams: false,
+                localStorageOnly: true,
+                encryptFiles: false,
+                autoDelete: false
+            };
+        }
+        
+        function applyTheme(theme) {
+            if (theme === 'auto') {
+                theme = prefersDark ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('mom-theme', theme);
+        }
+        
+        function updateTheme() {
+            const theme = document.getElementById('themeSelect').value;
+            applyTheme(theme);
+            updateSetting('theme', theme);
+        }
+        
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = current === 'light' ? 'dark' : 'light';
+            document.getElementById('themeSelect').value = newTheme;
+            applyTheme(newTheme);
+            updateSetting('theme', newTheme);
+        }
+        
+        function updateAudioLimit(value) {
+            document.getElementById('audioLengthValue').textContent = value;
+            updateSetting('audioMaxLength', parseInt(value));
+        }
+        
+        function updateTextLimit(value) {
+            document.getElementById('textLengthValue').textContent = value;
+            updateSetting('textMaxLength', parseInt(value));
+        }
+        
+        function updateMomWordLimit(value) {
+            document.getElementById('momWordLimitValue').textContent = value;
+            updateSetting('momWordLimit', parseInt(value));
+        }
+        
+        function updateSetting(key, value) {
+            const settings = JSON.parse(localStorage.getItem('momSettings')) || getDefaultSettings();
+            settings[key] = value;
+            localStorage.setItem('momSettings', JSON.stringify(settings));
+            
+            // Broadcast change to other windows
+            window.localStorage.setItem('settingsChanged', new Date().getTime());
+            
+            // Auto sync to backend
+            syncSettingsToBackend(settings);
+            showStatus('✓ Setting saved automatically', 'success', 1500);
+        }
+        
+        function saveSettings() {
+            const settings = {
+                theme: document.getElementById('themeSelect').value,
+                audioMaxLength: parseInt(document.getElementById('audioLengthSlider').value),
+                textMaxLength: parseInt(document.getElementById('textLengthSlider').value),
+                momWordLimit: parseInt(document.getElementById('momWordLimitSlider').value),
+                animations: document.getElementById('animationsToggle').checked,
+                compact: document.getElementById('compactToggle').checked,
+                autoFormat: document.getElementById('autoFormatToggle').checked,
+                autoGenerate: document.getElementById('autoGenerateToggle').checked,
+                showTimer: document.getElementById('timerToggle').checked,
+                browserNotify: document.getElementById('browserNotifyToggle').checked,
+                soundAlerts: document.getElementById('soundToggle').checked,
+                notificationLevel: document.getElementById('notificationLevelSelect').value,
+                defaultFormat: document.getElementById('defaultFormatSelect').value,
+                debug: document.getElementById('debugToggle').checked,
+                includeTimestamps: document.getElementById('includeTimestampsToggle').checked,
+                includeActionItems: document.getElementById('includeActionItemsToggle').checked,
+                teamsApiKey: document.getElementById('teamsApiKeyInput').value,
+                tenanttId: document.getElementById('tenantIdInput').value,
+                clientId: document.getElementById('clientIdInput').value,
+                meetingLink: document.getElementById('meetingLinkInput').value,
+                autoFetchTeams: document.getElementById('autoFetchTeamsToggle').checked,
+                localStorageOnly: document.getElementById('localStorageOnlyToggle').checked,
+                encryptFiles: document.getElementById('encryptFilesToggle').checked,
+                autoDelete: document.getElementById('autoDeleteToggle').checked
+            };
+            
+            localStorage.setItem('momSettings', JSON.stringify(settings));
+            
+            // Save server config
+            saveServerConfig();
+            
+            // Also sync to backend
+            syncSettingsToBackend(settings);
+            
+            showStatus('✓ All settings saved successfully!', 'success', 3000);
+        }
+        
+        function resetSettings() {
+            if (confirm('Are you sure? This will reset all settings to default.')) {
+                localStorage.removeItem('momSettings');
+                loadSettings();
+                showStatus('✓ Settings reset to default', 'info', 2000);
+            }
+        }
+        
+        function exportSettings() {
+            const settings = JSON.parse(localStorage.getItem('momSettings')) || getDefaultSettings();
+            const dataStr = JSON.stringify(settings, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `mom_settings_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showStatus('✓ Settings exported', 'success', 2000);
+        }
+        
+        function clearCache() {
+            if (confirm('Clear browser cache? This may slow down the app on next load.')) {
+                localStorage.clear();
+                showStatus('✓ Cache cleared', 'success', 2000);
+                setTimeout(() => location.reload(), 1500);
+            }
+        }
+        
+        function testNotification() {
+            showStatus('🔔 Test notification received!', 'success', 3000);
+            if (document.getElementById('soundToggle').checked) {
+                // Create a simple beep sound
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            }
+        }
+        
+        function showStatus(message, type = 'info', duration = 3000) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message show status-${type}`;
+            
+            if (duration > 0) {
+                setTimeout(() => {
+                    statusEl.classList.remove('show');
+                }, duration);
+            }
+        }
+        
+        function getBrowserName() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Chrome')) return 'Chrome';
+            if (ua.includes('Safari')) return 'Safari';
+            if (ua.includes('Firefox')) return 'Firefox';
+            if (ua.includes('Edge')) return 'Edge';
+            return 'Other';
+        }
+        
+        function goBack() {
+            window.location.href = 'http://127.0.0.1:5001';
+        }
+        
+        // New Settings Functions
+        function syncSettingsToBackend(settings) {
+            fetch('/api/v1/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(settings)
+            })
+            .catch(err => console.log('Backend settings sync skipped:', err));
+        }
+        
+        function testTeamsConnection() {
+            const apiKey = document.getElementById('teamsApiKeyInput').value;
+            const tenantId = document.getElementById('tenantIdInput').value;
+            const clientId = document.getElementById('clientIdInput').value;
+            
+            if (!apiKey || !tenantId || !clientId) {
+                showStatus('❌ Please fill in all Teams credentials', 'error', 3000);
+                return;
+            }
+            
+            showStatus('🔄 Testing Teams connection...', 'info');
+            
+            fetch('/api/v1/teams/test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    api_key: apiKey,
+                    tenant_id: tenantId,
+                    client_id: clientId
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showStatus('✓ Teams connection successful!', 'success', 3000);
+                } else {
+                    showStatus('❌ ' + (data.error || 'Connection failed'), 'error', 3000);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showStatus('❌ Connection test failed: ' + err.message, 'error', 3000);
+            });
+        }
+        
+        function fetchTeamsMeetings() {
+            const meetingLink = document.getElementById('meetingLinkInput').value;
+            
+            if (!meetingLink) {
+                showStatus('❌ Please enter a Teams meeting link', 'error', 3000);
+                return;
+            }
+            
+            showStatus('🔄 Fetching meeting from Teams...', 'info');
+            
+            const settings = JSON.parse(localStorage.getItem('momSettings'));
+            
+            fetch('/api/v1/teams/fetch-meeting', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    meeting_link: meetingLink,
+                    api_key: settings.teamsApiKey,
+                    tenant_id: settings.tenanttId,
+                    client_id: settings.clientId,
+                    word_limit: settings.momWordLimit || 300
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showStatus('✓ Meeting fetched and MOM generated!', 'success', 3000);
+                    if (data.mom) {
+                        localStorage.setItem('lastGeneratedMOM', data.mom);
+                        localStorage.setItem('lastGeneratedTranscript', data.transcript);
+                        setTimeout(() => window.location.href = 'http://127.0.0.1:5001?show_last=true', 1500);
+                    } else {
+                        setTimeout(() => window.location.href = 'http://127.0.0.1:5001', 1000);
+                    }
+                } else {
+                    showStatus('❌ ' + (data.error || 'Failed to fetch meeting'), 'error', 3000);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showStatus('❌ Fetch failed: ' + err.message, 'error', 3000);
+            });
+        }
+        
+        function clearAllData() {
+            if (confirm('⚠️ This will delete ALL meeting recordings and transcripts!\n\nContinue?')) {
+                if (confirm('Are you absolutely sure? This cannot be undone!')) {
+                    showStatus('🔄 Clearing all data...', 'info');
+                    
+                    fetch('/api/v1/data/clear', {
+                        method: 'POST'
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showStatus('✓ All data cleared successfully!', 'success', 3000);
+                        } else {
+                            showStatus('❌ Failed to clear data', 'error', 3000);
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        showStatus('❌ Error: ' + err.message, 'error', 3000);
+                    });
+                }
+            }
+        }
+        
+        function showStorageInfo() {
+            fetch('/api/v1/data/storage-info')
+            .then(res => res.json())
+            .then(data => {
+                let info = `📊 Storage Information\n`;
+                info += `═══════════════════════\n`;
+                info += `Total Size: ${formatBytes(data.total_size)}\n`;
+                info += `Recordings: ${formatBytes(data.recordings_size)} (${data.recordings_count} files)\n`;
+                info += `Transcripts: ${formatBytes(data.transcripts_size)} (${data.transcripts_count} files)\n`;
+                info += `MOMs: ${formatBytes(data.moms_size)} (${data.moms_count} files)\n`;
+                info += `\n📁 Location: ${data.storage_path}`;
+                
+                alert(info);
+                showStatus('✓ Storage info retrieved', 'success', 2000);
+            })
+            .catch(err => {
+                console.error(err);
+                showStatus('❌ Could not retrieve storage info', 'error', 3000);
+            });
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+        
+        // Server Configuration Functions
+        function loadServerConfig() {
+            fetch('/api/v1/config')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'ok' && data.config) {
+                        const config = data.config;
+                        
+                        // Update form fields
+                        if (document.getElementById('sttModelSelect')) {
+                            document.getElementById('sttModelSelect').value = config.stt_model || 'distil-small.en';
+                        }
+                        document.getElementById('chunkingModelSelect').value = config.chunking_model || 'qwen2.5:1.5b';
+                        document.getElementById('currentChunkingModelDisplay').textContent = config.chunking_model || 'Loading...';
+                        document.getElementById('ollamaModelSelect').value = config.ollama_model || 'qwen2.5:7b';
+                        document.getElementById('currentModelDisplay').textContent = config.ollama_model || 'Loading...';
+                        document.getElementById('ollamaUrlInput').value = config.ollama_url || 'http://localhost:11434';
+                        document.getElementById('whisperExeInput').value = config.whisper_exe || 'main.exe';
+                        document.getElementById('whisperModelInput').value = config.whisper_model || 'models/ggml-medium.bin';
+                        
+                        // Store in sessionStorage for comparison
+                        sessionStorage.setItem('serverConfig', JSON.stringify(config));
+                    }
+                })
+                .catch(err => {
+                    console.log('Could not load server config:', err);
+                    // Set defaults if unable to load
+                    document.getElementById('currentChunkingModelDisplay').textContent = 'qwen2.5:1.5b';
+                    document.getElementById('currentModelDisplay').textContent = 'qwen2.5:7b';
+                });
+        }
+        
+        function updateServerConfig(key, value) {
+            // Update the display immediately for user feedback
+            if (key === 'ollama_model') {
+                document.getElementById('currentModelDisplay').textContent = value;
+            } else if (key === 'chunking_model') {
+                document.getElementById('currentChunkingModelDisplay').textContent = value;
+            }
+            // Mark that config has changed
+            sessionStorage.setItem('configChanged', 'true');
+            // Auto save server config
+            saveServerConfig();
+        }
+        
+        function saveServerConfig() {
+            const config = {
+                chunking_model: document.getElementById('chunkingModelSelect').value,
+                ollama_model: document.getElementById('ollamaModelSelect').value,
+                ollama_url: document.getElementById('ollamaUrlInput').value,
+                whisper_exe: document.getElementById('whisperExeInput').value,
+                whisper_model: document.getElementById('whisperModelInput').value
+            };
+            
+            fetch('/api/v1/config', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(config)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    console.log('Server config saved successfully');
+                    sessionStorage.setItem('configChanged', 'false');
+                    sessionStorage.setItem('serverConfig', JSON.stringify(data.config));
+                } else {
+                    console.error('Failed to save config:', data.error);
+                }
+            })
+            .catch(err => {
+                console.error('Error saving server config:', err);
+                showStatus('⚠️ Failed to save server configuration: ' + err.message, 'error', 5000);
+            });
+        }
+        
+        function testOllamaConnection() {
+            const url = document.getElementById('ollamaUrlInput').value;
+            showStatus('🔄 Testing Ollama connection...', 'info');
+            
+            fetch(url + '/api/tags', {timeout: 10000})
+                .then(res => res.json())
+                .then(data => {
+                    if (data.models && Array.isArray(data.models)) {
+                        const modelNames = data.models.map(m => m.name).join(', ');
+                        showStatus(`✓ Ollama connected! Available models: ${modelNames}`, 'success', 5000);
+                    } else {
+                        showStatus('⚠️ Connected but no models found', 'warning', 3000);
+                    }
+                })
+                .catch(err => {
+                    showStatus(`❌ Cannot connect to Ollama at ${url}: ${err.message}`, 'error', 5000);
+                });
+        }
+        
+        function listAvailableModels() {
+            const url = document.getElementById('ollamaUrlInput').value;
+            showStatus('🔄 Fetching available models...', 'info');
+            
+            fetch(url + '/api/tags')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.models && Array.isArray(data.models)) {
+                        const models = data.models.map(m => `• ${m.name} (${formatBytes(m.size || 0)})`).join('\n');
+                        alert('Available Ollama Models:\n\n' + models);
+                        showStatus('✓ Model list retrieved', 'success', 2000);
+                    } else {
+                        showStatus('❌ No models found or invalid response', 'error', 3000);
+                    }
+                })
+                .catch(err => {
+                    showStatus(`❌ Failed to fetch models: ${err.message}`, 'error', 3000);
+                });
+        }
+        
+        function saveAllSettings() {
+            showStatus('💾 Saving all settings...', 'info');
+            saveSettings();
+        }
+        
+        // Listen for settings changes from other windows
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'settingsChanged') {
+                loadSettings();
+            }
+        });
+    </script>
+</body>
+</html>

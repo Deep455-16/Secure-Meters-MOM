@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Microsoft Teams Integration – MOM Generator | Secure Meters Ltd.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =========================================================
+       CSS CUSTOM PROPERTIES – LIGHT / DARK THEME
+    ========================================================= */
+    :root {
+      /* brand */
+      --primary:        #1F3864;
+      --primary-light:  #2a4d8f;
+      --accent:         #D97706;
+      --accent-light:   #F59E0B;
+      --teams-purple:   #6264A7;
+      --teams-purple-light: #7B7DC4;
+
+      /* surfaces */
+      --bg:             #F8FAFC;
+      --bg-card:        #FFFFFF;
+      --bg-card2:       #F1F5F9;
+      --bg-input:       #FFFFFF;
+      --border:         #E2E8F0;
+      --border-strong:  #CBD5E1;
+
+      /* text */
+      --text-primary:   #0F172A;
+      --text-secondary: #475569;
+      --text-muted:     #94A3B8;
+      --text-on-dark:   #FFFFFF;
+
+      /* misc */
+      --shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --shadow-md:  0 4px 16px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.07);
+      --shadow-lg:  0 10px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.08);
+      --radius-sm:  8px;
+      --radius-md:  14px;
+      --radius-lg:  20px;
+      --radius-xl:  28px;
+      --transition: .22s cubic-bezier(.4,0,.2,1);
+    }
+
+    [data-theme="dark"] {
+      --bg:             #0D1117;
+      --bg-card:        #161B22;
+      --bg-card2:       #1C2330;
+      --bg-input:       #1C2330;
+      --border:         #2D3748;
+      --border-strong:  #3D4F6A;
+      --text-primary:   #E2E8F0;
+      --text-secondary: #94A3B8;
+      --text-muted:     #64748B;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,.4);
+      --shadow-md:  0 4px 16px rgba(0,0,0,.5);
+      --shadow-lg:  0 10px 40px rgba(0,0,0,.6);
+    }
+
+    /* =========================================================
+       RESET & BASE
+    ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      transition: background var(--transition), color var(--transition);
+      overflow-x: hidden;
+    }
+
+    /* =========================================================
+       TOPBAR
+    ========================================================= */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-sm);
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .topbar-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Back button */
+    #btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border-strong);
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--transition);
+    }
+    #btn-back:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      transform: translateX(-2px);
+    }
+    #btn-back svg { flex-shrink: 0; }
+
+    /* Brand badge */
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--primary), var(--teams-purple));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .brand-logo svg { width: 20px; height: 20px; }
+    .brand-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -.3px;
+    }
+    .brand-name span { color: var(--primary); }
+
+    /* Theme toggle */
+    #theme-toggle {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-strong);
+      background: var(--bg-card2);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    #theme-toggle:hover {
+      background: var(--teams-purple);
+      border-color: var(--teams-purple);
+      color: #fff;
+      transform: rotate(20deg);
+    }
+
+    /* =========================================================
+       NOTIFICATION BANNER
+    ========================================================= */
+    .notification-banner {
+      background: linear-gradient(90deg, var(--primary), var(--teams-purple));
+      color: #fff;
+      padding: 10px 24px;
+      text-align: center;
+      font-size: 13.5px;
+      font-weight: 500;
+      letter-spacing: .01em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .notification-banner .notif-icon {
+      font-size: 16px;
+      animation: pulse-icon 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse-icon {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50%      { transform: scale(1.25); opacity: .75; }
+    }
+    #notif-dismiss {
+      margin-left: 16px;
+      background: rgba(255,255,255,.2);
+      border: none;
+      border-radius: 50%;
+      width: 22px; height: 22px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: background var(--transition);
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    #notif-dismiss:hover { background: rgba(255,255,255,.38); }
+
+    /* =========================================================
+       MAIN CONTENT
+    ========================================================= */
+    .page-content {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* Section headings */
+    .section-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--teams-purple);
+      margin-bottom: 8px;
+    }
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      font-size: 15px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+    .section-divider {
+      height: 3px;
+      width: 48px;
+      background: linear-gradient(90deg, var(--teams-purple), var(--accent));
+      border-radius: 99px;
+      margin: 10px 0 32px;
+    }
+
+    /* =========================================================
+       COMING SOON HERO
+    ========================================================= */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      margin-top: 36px;
+      margin-bottom: 56px;
+      padding: 64px 56px;
+      background: linear-gradient(135deg, #1F3864 0%, #2D3591 40%, #6264A7 75%, #8B5CF6 100%);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* shimmer overlay */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg,
+        transparent 20%,
+        rgba(255,255,255,.08) 40%,
+        rgba(255,255,255,.15) 50%,
+        rgba(255,255,255,.08) 60%,
+        transparent 80%);
+      background-size: 220% 100%;
+      animation: shimmer 3.5s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* grid noise texture */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(130,100,200,.18) 0%, transparent 45%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .hero-text { flex: 1; min-width: 260px; }
+
+    .coming-soon-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      backdrop-filter: blur(6px);
+    }
+    .coming-soon-badge .dot {
+      width: 7px; height: 7px;
+      background: var(--accent-light);
+      border-radius: 50%;
+      animation: blink-dot 1.4s ease-in-out infinite;
+    }
+    @keyframes blink-dot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .4; transform: scale(.7); }
+    }
+
+    .hero-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(26px, 4.5vw, 46px);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+      letter-spacing: -.5px;
+      margin-bottom: 16px;
+    }
+    .hero-title .highlight {
+      background: linear-gradient(90deg, #F59E0B, #FCD34D);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 15.5px;
+      color: rgba(255,255,255,.80);
+      max-width: 520px;
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    /* timeline pill */
+    .hero-timeline {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-sm);
+      padding: 10px 20px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .hero-timeline svg { opacity: .75; }
+
+    /* hero graphic */
+    .hero-graphic {
+      flex-shrink: 0;
+      position: relative;
+    }
+    .hero-teams-icon {
+      width: 130px; height: 130px;
+      background: rgba(255,255,255,.12);
+      border: 2px solid rgba(255,255,255,.22);
+      border-radius: 32px;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+      animation: float-icon 4s ease-in-out infinite;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    @keyframes float-icon {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-12px); }
+    }
+    .hero-teams-icon svg { width: 72px; height: 72px; }
+
+    /* orbit dots */
+    .orbit-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 180px; height: 180px;
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .orbit-dot {
+      position: absolute;
+      width: 10px; height: 10px;
+      background: rgba(255,255,255,.55);
+      border-radius: 50%;
+      animation: orbit 6s linear infinite;
+    }
+    .orbit-dot:nth-child(1) { animation-delay: 0s; }
+    .orbit-dot:nth-child(2) { animation-delay: -2s; }
+    .orbit-dot:nth-child(3) { animation-delay: -4s; }
+    @keyframes orbit {
+      from { transform: rotate(0deg) translateX(90px); }
+      to   { transform: rotate(360deg) translateX(90px); }
+    }
+
+    /* =========================================================
+       SETUP GUIDE
+    ========================================================= */
+    .setup-section { margin-bottom: 56px; }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 8px;
+    }
+
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 26px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+    .step-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--teams-purple), var(--accent));
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .step-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--teams-purple);
+    }
+    .step-card:hover::before { opacity: 1; }
+
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--teams-purple), #5456A0);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 14px rgba(98,100,167,.4);
+    }
+
+    .step-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .step-connector {
+      display: none;
+    }
+    @media (min-width: 900px) {
+      .steps-grid { position: relative; }
+    }
+
+    /* =========================================================
+       CONFIGURATION FORM
+    ========================================================= */
+    .config-section { margin-bottom: 56px; }
+
+    .config-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+      margin-bottom: 28px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: .03em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .form-label .required { color: #EF4444; }
+
+    .form-input-wrap {
+      position: relative;
+    }
+    .form-input {
+      width: 100%;
+      padding: 12px 44px 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+      outline: none;
+    }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-input:focus {
+      border-color: var(--teams-purple);
+      box-shadow: 0 0 0 3px rgba(98,100,167,.18);
+    }
+
+    .form-input-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%; transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .toggle-pass {
+      position: absolute;
+      right: 12px;
+      top: 50%; transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      display: flex; align-items: center;
+      transition: color var(--transition);
+    }
+    .toggle-pass:hover { color: var(--teams-purple); }
+
+    .form-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .form-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 26px;
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(31,56,100,.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(31,56,100,.45);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-teams {
+      background: linear-gradient(135deg, var(--teams-purple), #5254A3);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(98,100,167,.35);
+    }
+    .btn-teams:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(98,100,167,.45);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--border-strong);
+      color: var(--text-secondary);
+    }
+    .btn-outline:hover {
+      background: var(--bg-card2);
+      border-color: var(--teams-purple);
+      color: var(--teams-purple);
+    }
+
+    /* spinner for test */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2.5px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* save success tag */
+    .save-tag {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #10B981;
+      animation: fade-in-tag .3s ease;
+    }
+    .save-tag.show { display: flex; }
+    @keyframes fade-in-tag {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* test result toast */
+    .test-result {
+      display: none;
+      margin-top: 18px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      align-items: flex-start;
+      gap: 10px;
+      animation: slide-in-toast .3s ease;
+    }
+    .test-result.show { display: flex; }
+    .test-result.info  {
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border-left: 4px solid #3B82F6;
+    }
+    .test-result.success {
+      background: #ECFDF5;
+      color: #065F46;
+      border-left: 4px solid #10B981;
+    }
+    .test-result.error {
+      background: #FEF2F2;
+      color: #991B1B;
+      border-left: 4px solid #EF4444;
+    }
+    [data-theme="dark"] .test-result.info    { background: rgba(59,130,246,.12); color: #93C5FD; }
+    [data-theme="dark"] .test-result.success { background: rgba(16,185,129,.12); color: #6EE7B7; }
+    [data-theme="dark"] .test-result.error   { background: rgba(239,68,68,.12);  color: #FCA5A5; }
+    @keyframes slide-in-toast {
+      from { opacity:0; transform: translateY(-8px); }
+      to   { opacity:1; transform: none; }
+    }
+
+    /* =========================================================
+       PLANNED FEATURES
+    ========================================================= */
+    .features-section { margin-bottom: 56px; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: all var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    .feature-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--accent);
+    }
+
+    .feature-icon-wrap {
+      flex-shrink: 0;
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(217,119,6,.15), rgba(245,158,11,.08));
+      border: 1px solid rgba(217,119,6,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .feature-card:hover .feature-icon-wrap {
+      background: linear-gradient(135deg, rgba(217,119,6,.25), rgba(245,158,11,.18));
+    }
+
+    .feature-body { flex: 1; }
+    .feature-title {
+      font-weight: 700;
+      font-size: 14.5px;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+    .feature-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .soon-badge {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 2px 10px;
+      border-radius: 99px;
+      background: rgba(217,119,6,.12);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border: 1px solid rgba(217,119,6,.22);
+    }
+
+    /* =========================================================
+       SETTINGS LINK
+    ========================================================= */
+    .settings-cta {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 30px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 56px;
+      transition: border-color var(--transition);
+    }
+    .settings-cta:hover { border-color: var(--primary); }
+
+    .settings-cta-text .cta-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+    .settings-cta-text .cta-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+    .page-footer {
+      text-align: center;
+      padding: 20px 0 0;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .page-footer strong { color: var(--text-secondary); }
+
+    /* =========================================================
+       SCROLL ANIMATIONS
+    ========================================================= */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+    @media (max-width: 640px) {
+      .hero { padding: 40px 28px; }
+      .hero-graphic { display: none; }
+      .config-card { padding: 24px 20px; }
+      .topbar-inner { padding: 0 16px; }
+      .page-content { padding: 0 16px 60px; }
+      .brand-name { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====================== NOTIFICATION BANNER (REMOVED) ====================== -->
+
+  <!-- ====================== TOPBAR ====================== -->
+  <header class="topbar" role="banner">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <!-- Back to Home -->
+        <a href="/" id="btn-back" aria-label="Back to Home">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12L4 7L9 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Back to Home
+        </a>
+
+        <!-- Brand -->
+        <div class="brand-badge">
+          <div class="brand-logo" aria-hidden="true">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 4h14v8a2 2 0 01-2 2H5a2 2 0 01-2-2V4z" fill="rgba(255,255,255,.9)"/>
+              <path d="M7 14v2m6-2v2M5 16h10" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="brand-name"><span>MOM</span> Generator</span>
+        </div>
+      </div>
+
+      <!-- Theme Toggle -->
+      <button id="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+        <svg id="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg id="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ====================== PAGE CONTENT ====================== -->
+  <main class="page-content" id="main-content">
+
+    <!-- COMING SOON HERO -->
+    <section class="hero fade-in" id="hero-section" aria-labelledby="hero-title">
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1 class="hero-title" id="hero-title">
+            Microsoft Teams<br/>
+            <span class="highlight">Integration</span>
+          </h1>
+          <p class="hero-desc">
+            Seamlessly connect your Microsoft Teams workspace to the MOM Generator — auto-fetch meeting recordings, generate Minutes of Meeting in one click, and share them directly from Teams.
+          </p>
+        </div>
+
+        <!-- Animated Teams Icon -->
+        <div class="hero-graphic" aria-hidden="true">
+          <div style="position:relative; width:180px; height:180px; display:flex; align-items:center; justify-content:center;">
+            <div class="orbit-ring">
+              <div class="orbit-dot" style="top:0; left:50%; margin-left:-5px;"></div>
+              <div class="orbit-dot" style="top:50%; right:0; margin-top:-5px;"></div>
+              <div class="orbit-dot" style="bottom:0; left:50%; margin-left:-5px;"></div>
+            </div>
+            <div class="hero-teams-icon">
+              <!-- Microsoft Teams SVG logo -->
+              <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- T letter shape Teams-inspired -->
+                <rect width="72" height="72" rx="18" fill="rgba(255,255,255,.08)"/>
+                <!-- Main T icon shape -->
+                <path d="M43 20h10a3 3 0 013 3v18a3 3 0 01-3 3h-5v6l-8-6H30a3 3 0 01-3-3V23a3 3 0 013-3h13z" fill="white" opacity=".95"/>
+                <path d="M20 28h18a2 2 0 012 2v12a2 2 0 01-2 2h-4v5l-6-5H20a2 2 0 01-2-2V30a2 2 0 012-2z" fill="#6264A7"/>
+                <circle cx="47.5" cy="17.5" r="5.5" fill="#F59E0B"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETUP GUIDE -->
+    <section class="setup-section fade-in" id="setup-guide" aria-labelledby="setup-title">
+      <p class="section-label">How it works</p>
+      <h2 class="section-title" id="setup-title">Setup Guide</h2>
+      <p class="section-sub">Follow these three steps to get Teams integration ready when the feature launches.</p>
+      <div class="section-divider"></div>
+
+      <div class="steps-grid" role="list">
+        <!-- Step 1 -->
+        <article class="step-card" role="listitem">
+          <div class="step-num" aria-label="Step 1">1</div>
+          <h3 class="step-title">Register App in Azure AD Portal</h3>
+          <p class="step-desc">
+            Sign into <strong>portal.azure.com</strong> → Azure Active Directory → App Registrations → New Registration. Give your app a name, set the redirect URI, and note down the <em>Client ID</em> and <em>Tenant ID</em>.
+          </p>
+        </article>
+
+        <!-- Step 2 -->
+        <article class="step-card" role="listitem">
+          <div class="step-num" aria-label="Step 2">2</div>
+          <h3 class="step-title">Configure Credentials in Settings</h3>
+          <p class="step-desc">
+            Generate a <em>Client Secret</em> under Certificates &amp; Secrets in Azure. Then paste the <strong>API Key</strong>, <strong>Tenant ID</strong>, and <strong>Client ID</strong> into the configuration form below and hit Save.
+          </p>
+        </article>
+
+        <!-- Step 3 -->
+        <article class="step-card" role="listitem">
+          <div class="step-num" aria-label="Step 3">3</div>
+          <h3 class="step-title">Connect and Fetch Meetings</h3>
+          <p class="step-desc">
+            Click <em>Test Connection</em> to verify your credentials against the MOM Generator API. Once confirmed, the integration will auto-discover your Teams calendar and available meeting recordings.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- CONFIGURATION FORM -->
+    <section class="config-section fade-in" id="config-section" aria-labelledby="config-title">
+      <p class="section-label">Credentials</p>
+      <h2 class="section-title" id="config-title">Configuration</h2>
+      <p class="section-sub">Your credentials are stored locally in your browser and never sent to any external server.</p>
+      <div class="section-divider"></div>
+
+      <div class="config-card">
+        <form id="teams-config-form" novalidate autocomplete="off">
+          <div class="form-grid">
+            <!-- Teams API Key -->
+            <div class="form-group">
+              <label class="form-label" for="input-api-key">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                Teams API Key
+                <span class="required" aria-label="required">*</span>
+              </label>
+              <div class="form-input-wrap">
+                <input
+                  type="password"
+                  id="input-api-key"
+                  name="teamsApiKey"
+                  class="form-input"
+                  placeholder="Enter your Teams API secret key"
+                  autocomplete="new-password"
+                  aria-required="true"
+                />
+                <button type="button" class="toggle-pass" id="toggle-api-key" aria-label="Show/hide API key" title="Toggle visibility">
+                  <svg id="eye-icon-key" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <span class="form-hint">Client Secret generated in Azure AD App Registrations.</span>
+            </div>
+
+            <!-- Azure Tenant ID -->
+            <div class="form-group">
+              <label class="form-label" for="input-tenant-id">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Azure Tenant ID
+                <span class="required" aria-label="required">*</span>
+              </label>
+              <div class="form-input-wrap">
+                <input
+                  type="text"
+                  id="input-tenant-id"
+                  name="tenantId"
+                  class="form-input"
+                  placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                  aria-required="true"
+                />
+                <span class="form-input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </span>
+              </div>
+              <span class="form-hint">Found under Azure AD → Overview → Tenant ID.</span>
+            </div>
+
+            <!-- Azure Client ID -->
+            <div class="form-group">
+              <label class="form-label" for="input-client-id">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Azure Client ID
+                <span class="required" aria-label="required">*</span>
+              </label>
+              <div class="form-input-wrap">
+                <input
+                  type="text"
+                  id="input-client-id"
+                  name="clientId"
+                  class="form-input"
+                  placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                  aria-required="true"
+                />
+                <span class="form-input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </span>
+              </div>
+              <span class="form-hint">Found under Azure AD → App Registrations → Application (client) ID.</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="btn-save">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save Configuration
+            </button>
+
+            <button type="button" class="btn btn-teams" id="btn-test">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Test Connection
+            </button>
+
+            <button type="button" class="btn btn-outline" id="btn-clear">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              Clear
+            </button>
+
+            <!-- Save confirmation -->
+            <div class="save-tag" id="save-tag" role="status" aria-live="polite">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Saved!
+            </div>
+          </div>
+
+          <!-- Test result panel -->
+          <div class="test-result" id="test-result" role="alert" aria-live="polite"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- INTEGRATION FEATURES -->
+    <section class="features-section fade-in" id="integration-features" aria-labelledby="features-title">
+      <p class="section-label">Capabilities</p>
+      <h2 class="section-title" id="features-title">Integration Features</h2>
+      <p class="section-sub">Here's what the Teams Integration brings to your MOM workflow.</p>
+      <div class="section-divider"></div>
+
+      <div class="features-grid" role="list">
+        <!-- Feature 1 -->
+        <article class="feature-card" role="listitem">
+          <div class="feature-icon-wrap" aria-hidden="true">🎬</div>
+          <div class="feature-body">
+            <div class="feature-title">Auto-fetch Meeting Recordings</div>
+            <div class="feature-desc">Automatically pull meeting recordings from Teams once a call ends — no manual upload needed.</div>
+          </div>
+        </article>
+
+        <!-- Feature 2 -->
+        <article class="feature-card" role="listitem">
+          <div class="feature-icon-wrap" aria-hidden="true">⚡</div>
+          <div class="feature-body">
+            <div class="feature-title">One-click MOM Generation</div>
+            <div class="feature-desc">Generate a complete Minutes of Meeting document directly from your Teams meeting with a single click.</div>
+          </div>
+        </article>
+
+        <!-- Feature 3 -->
+        <article class="feature-card" role="listitem">
+          <div class="feature-icon-wrap" aria-hidden="true">📅</div>
+          <div class="feature-body">
+            <div class="feature-title">Calendar Integration</div>
+            <div class="feature-desc">Sync your Teams calendar to see upcoming meetings and have MOM drafts prepared before they begin.</div>
+          </div>
+        </article>
+
+        <!-- Feature 4 -->
+        <article class="feature-card" role="listitem">
+          <div class="feature-icon-wrap" aria-hidden="true">📧</div>
+          <div class="feature-body">
+            <div class="feature-title">Email MOM Directly from Teams</div>
+            <div class="feature-desc">Send the finalized MOM to all meeting participants right from within Teams — no switching apps.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- SETTINGS LINK -->
+    <div class="settings-cta fade-in" id="settings-cta">
+      <div class="settings-cta-text">
+        <p class="cta-title">Full Configuration in Settings</p>
+        <p class="cta-sub">Visit the Settings page for advanced options, notification preferences, and API management.</p>
+      </div>
+      <a href="/settings" class="btn btn-primary" id="btn-go-settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Go to Settings
+      </a>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="page-footer" role="contentinfo">
+      <p>© 2026 <strong>Secure Meters Ltd.</strong> — MOM Generator &nbsp;|&nbsp; Microsoft Teams Integration Module</p>
+    </footer>
+
+  </main><!-- /page-content -->
+
+  <!-- ====================== JAVASCRIPT ====================== -->
+  <script>
+    'use strict';
+
+    /* ─── THEME ─── */
+    (function initTheme() {
+      const stored = localStorage.getItem('mom-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = stored || (prefersDark ? 'dark' : 'light');
+      applyTheme(theme);
+    })();
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('mom-theme', theme);
+      const sun  = document.getElementById('icon-sun');
+      const moon = document.getElementById('icon-moon');
+      if (!sun || !moon) return;
+      if (theme === 'dark') {
+        sun.style.display  = 'block';
+        moon.style.display = 'none';
+      } else {
+        sun.style.display  = 'none';
+        moon.style.display = 'block';
+      }
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', function () {
+      const current = document.documentElement.getAttribute('data-theme');
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+
+
+
+    /* ─── LOAD SAVED CONFIG ─── */
+    (function loadConfig() {
+      const saved = JSON.parse(localStorage.getItem('teams-config') || '{}');
+      if (saved.teamsApiKey)  document.getElementById('input-api-key').value  = saved.teamsApiKey;
+      if (saved.tenantId)     document.getElementById('input-tenant-id').value = saved.tenantId;
+      if (saved.clientId)     document.getElementById('input-client-id').value  = saved.clientId;
+    })();
+
+    /* ─── TOGGLE API KEY VISIBILITY ─── */
+    document.getElementById('toggle-api-key').addEventListener('click', function () {
+      const input = document.getElementById('input-api-key');
+      const isPass = input.type === 'password';
+      input.type = isPass ? 'text' : 'password';
+      // swap eye icon
+      const icon = document.getElementById('eye-icon-key');
+      if (isPass) {
+        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+      } else {
+        icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+      }
+    });
+
+    /* ─── SAVE CONFIG ─── */
+    document.getElementById('teams-config-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const apiKey   = document.getElementById('input-api-key').value.trim();
+      const tenantId = document.getElementById('input-tenant-id').value.trim();
+      const clientId = document.getElementById('input-client-id').value.trim();
+
+      if (!apiKey && !tenantId && !clientId) {
+        showTestResult('info', 'ℹ️', 'Please fill in at least one field before saving.');
+        return;
+      }
+
+      localStorage.setItem('teams-config', JSON.stringify({ teamsApiKey: apiKey, tenantId: tenantId, clientId: clientId }));
+
+      const tag = document.getElementById('save-tag');
+      tag.classList.add('show');
+      setTimeout(function () { tag.classList.remove('show'); }, 2800);
+    });
+
+    /* ─── CLEAR CONFIG ─── */
+    document.getElementById('btn-clear').addEventListener('click', function () {
+      document.getElementById('input-api-key').value   = '';
+      document.getElementById('input-tenant-id').value  = '';
+      document.getElementById('input-client-id').value  = '';
+      localStorage.removeItem('teams-config');
+      hideTestResult();
+    });
+
+    /* ─── TEST CONNECTION ─── */
+    document.getElementById('btn-test').addEventListener('click', async function () {
+      const btn = this;
+      const originalHTML = btn.innerHTML;
+
+      // Set loading state
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Testing…';
+
+      hideTestResult();
+
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(function () { controller.abort(); }, 6000);
+
+        const response = await fetch('http://127.0.0.1:5001/api/v1/teams/test', {
+          method: 'GET',
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        clearTimeout(timeout);
+
+        if (response.ok) {
+          let data = {};
+          try { data = await response.json(); } catch (_) { /* ignore */ }
+          showTestResult('success', '✅', data.message || 'Connection successful! Teams API is reachable and credentials are valid.');
+        } else {
+          showTestResult('error', '❌', 'Server responded with status ' + response.status + ' — ' + (response.statusText || 'Check your credentials.'));
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          showTestResult('info', 'ℹ️', 'Connection timed out. The backend server at <code>http://127.0.0.1:5001</code> may not be running. Start the MOM Generator server and try again.');
+        } else if (err.message && err.message.includes('fetch')) {
+          showTestResult('info', 'ℹ️', 'Cannot reach the MOM Generator backend (<code>http://127.0.0.1:5001</code>). Ensure the server is running locally. The Teams integration API will be fully available in Q3 2026.');
+        } else {
+          showTestResult('error', '⚠️', 'Unexpected error: ' + err.message);
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+      }
+    });
+
+    function showTestResult(type, icon, message) {
+      const el = document.getElementById('test-result');
+      el.className = 'test-result show ' + type;
+      el.innerHTML = '<span style="font-size:16px;flex-shrink:0;">' + icon + '</span><span>' + message + '</span>';
+    }
+
+    function hideTestResult() {
+      const el = document.getElementById('test-result');
+      el.className = 'test-result';
+      el.innerHTML = '';
+    }
+
+    /* ─── SCROLL FADE-IN ANIMATION ─── */
+    const fadeEls = document.querySelectorAll('.fade-in');
+
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.07 });
+
+    fadeEls.forEach(function (el, i) {
+      el.style.transitionDelay = (i * 0.07) + 's';
+      observer.observe(el);
+    });
+
+    /* ─── KEYBOARD: ESCAPE clears test result ─── */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') hideTestResult();
+    });
+  </script>
+</body>
+</html>

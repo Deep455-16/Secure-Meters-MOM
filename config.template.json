@@ -1,0 +1,15 @@
+{
+  "whisper_exe": "main.exe",
+  "whisper_model": "models/ggml-medium.bin",
+  "ollama_url": "http://localhost:11434",
+  "ollama_model": "mistral:latest",
+  "output_dir": ".",
+  
+  "teams_client_id": "YOUR_AZURE_CLIENT_ID_HERE",
+  "teams_client_secret": "YOUR_AZURE_CLIENT_SECRET_HERE",
+  "teams_tenant_id": "common",
+  
+  "api_host": "0.0.0.0",
+  "api_port": 5000,
+  "api_debug": false
+}

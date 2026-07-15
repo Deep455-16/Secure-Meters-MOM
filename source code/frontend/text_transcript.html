@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text Transcript — MOM Generator | Secure Meters Ltd.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── CSS Custom Properties ─────────────────────────────── */
+    :root {
+      --primary:        #1F3864;
+      --primary-light:  #2a4d8f;
+      --accent:         #0891B2;
+      --accent-light:   #06B6D4;
+      --accent-glow:    rgba(8, 145, 178, 0.18);
+      --accent-soft:    rgba(8, 145, 178, 0.08);
+
+      --bg:             #f5f7fb;
+      --surface:        #ffffff;
+      --surface-alt:    #f0f4fa;
+      --surface-hover:  #e8eef8;
+      --border:         #d8e1ef;
+      --border-focus:   #0891B2;
+
+      --text-primary:   #0f1d35;
+      --text-secondary: #4a5e80;
+      --text-muted:     #8498b8;
+      --text-inverse:   #ffffff;
+
+      --shadow-sm:      0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-md:      0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+      --shadow-lg:      0 10px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
+      --shadow-accent:  0 8px 24px rgba(8,145,178,.25);
+
+      --radius-sm:  6px;
+      --radius-md:  10px;
+      --radius-lg:  16px;
+      --radius-xl:  22px;
+
+      --warn-yellow: #f59e0b;
+      --warn-red:    #ef4444;
+      --success:     #10b981;
+
+      --transition: 0.22s cubic-bezier(.4,0,.2,1);
+    }
+
+    [data-theme="dark"] {
+      --bg:             #0a0f1e;
+      --surface:        #111827;
+      --surface-alt:    #1a2236;
+      --surface-hover:  #1f2d47;
+      --border:         #1e2e4a;
+      --border-focus:   #06B6D4;
+
+      --text-primary:   #e8edf8;
+      --text-secondary: #94a8c8;
+      --text-muted:     #56708f;
+      --text-inverse:   #0f1d35;
+
+      --shadow-sm:      0 1px 3px rgba(0,0,0,.4);
+      --shadow-md:      0 4px 16px rgba(0,0,0,.5);
+      --shadow-lg:      0 10px 40px rgba(0,0,0,.6);
+      --accent-soft:    rgba(8,145,178,.12);
+      --accent-glow:    rgba(8,145,178,.22);
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Top Bar ───────────────────────────────────────────── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(12px);
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .topbar-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 28px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 14px; }
+
+    /* Back Button */
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--transition);
+    }
+    .btn-back:hover {
+      background: var(--surface-hover);
+      color: var(--accent);
+      border-color: var(--accent);
+      transform: translateX(-2px);
+    }
+    .btn-back svg { flex-shrink: 0; transition: transform var(--transition); }
+    .btn-back:hover svg { transform: translateX(-2px); }
+
+    /* Logo / Title area */
+    .topbar-brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: var(--shadow-accent);
+      flex-shrink: 0;
+    }
+    .brand-icon svg { color: #fff; }
+    .brand-text { display: flex; flex-direction: column; line-height: 1; }
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -.3px;
+    }
+    .brand-sub {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+    /* Company badge */
+    .company-badge {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(8,145,178,.2);
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: .3px;
+    }
+    .company-badge-dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .5; transform: scale(.8); }
+    }
+
+    /* Theme Toggle */
+    #theme-toggle {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+    #theme-toggle:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: rotate(15deg);
+    }
+
+    /* ─── Page Header ───────────────────────────────────────── */
+    .page-header {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px 28px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .page-header-left { display: flex; align-items: center; gap: 16px; }
+    .page-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: var(--shadow-accent);
+      flex-shrink: 0;
+    }
+    .page-title-block {}
+    .page-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -.5px;
+      line-height: 1.1;
+    }
+    .page-desc {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+    .page-header-right { display: flex; align-items: center; gap: 8px; }
+
+    /* Format Selector */
+    .format-group { display: flex; align-items: center; gap: 8px; }
+    .format-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); white-space: nowrap; }
+    #format-select {
+      padding: 9px 34px 9px 14px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230891B2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 14px;
+      transition: all var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    #format-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    #format-select:hover { border-color: var(--accent); }
+
+    /* ─── Main Layout ───────────────────────────────────────── */
+    .main-content {
+      flex: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Split Pane */
+    .split-pane {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    /* ─── Card Base ─────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .card:hover { box-shadow: var(--shadow-lg); }
+    .card-header {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-shrink: 0;
+      background: var(--surface-alt);
+    }
+    .card-title-row { display: flex; align-items: center; gap: 8px; }
+    .card-icon {
+      width: 30px; height: 30px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-icon.cyan { background: var(--accent-soft); color: var(--accent); }
+    .card-icon.navy { background: rgba(31,56,100,.1); color: var(--primary); }
+    [data-theme="dark"] .card-icon.navy { background: rgba(31,56,100,.25); color: #7fa3d4; }
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -.2px;
+    }
+    .card-actions { display: flex; align-items: center; gap: 6px; }
+    .card-body { flex: 1; display: flex; flex-direction: column; padding: 18px 22px; gap: 14px; overflow: hidden; }
+
+    /* ─── Textarea ──────────────────────────────────────────── */
+    .textarea-wrapper { position: relative; flex: 1; display: flex; flex-direction: column; }
+    #transcript-input {
+      flex: 1;
+      min-height: 320px;
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      line-height: 1.7;
+      resize: vertical;
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    }
+    #transcript-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    #transcript-input::placeholder { color: var(--text-muted); }
+
+    /* Character Limit Warning Banner */
+    .limit-banner {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      font-weight: 500;
+      border: 1px solid;
+      transition: all var(--transition);
+    }
+    .limit-banner.warn-80 {
+      display: flex;
+      background: rgba(245,158,11,.08);
+      border-color: rgba(245,158,11,.3);
+      color: var(--warn-yellow);
+    }
+    .limit-banner.warn-95 {
+      display: flex;
+      background: rgba(239,68,68,.08);
+      border-color: rgba(239,68,68,.3);
+      color: var(--warn-red);
+    }
+
+    /* Stat Row */
+    .stat-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .stat-chip {
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 10px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+    .stat-chip .val {
+      font-weight: 700;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-chip svg { color: var(--text-muted); }
+
+    /* Progress bar */
+    .limit-progress-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .limit-progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+
+    /* Input Action Row */
+    .input-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* ─── Buttons ───────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 9px 18px;
+      border-radius: var(--radius-md);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      text-decoration: none;
+      transition: all var(--transition);
+      white-space: nowrap;
+      letter-spacing: -.1px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0);
+      transition: background 0.15s;
+    }
+    .btn:hover::after { background: rgba(255,255,255,.08); }
+    .btn:active { transform: scale(.97); }
+    .btn:disabled { opacity: .48; cursor: not-allowed; pointer-events: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: #fff;
+      box-shadow: var(--shadow-accent);
+    }
+    .btn-primary:hover { box-shadow: 0 8px 28px rgba(8,145,178,.38); transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: var(--surface-alt);
+      border-color: var(--border);
+      color: var(--text-secondary);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text-secondary);
+    }
+    .btn-ghost:hover { background: var(--surface-alt); color: var(--text-primary); border-color: var(--border); }
+
+    .btn-danger {
+      background: transparent;
+      border-color: rgba(239,68,68,.25);
+      color: #ef4444;
+    }
+    .btn-danger:hover { background: rgba(239,68,68,.07); border-color: rgba(239,68,68,.5); }
+
+    .btn-success {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: #fff;
+    }
+    .btn-success:hover { box-shadow: 0 6px 20px rgba(16,185,129,.35); transform: translateY(-1px); }
+
+    .btn-sm { padding: 6px 12px; font-size: 12.5px; border-radius: var(--radius-sm); gap: 5px; }
+    .btn-lg { padding: 13px 26px; font-size: 15px; }
+
+    /* Generate Button */
+    #generate-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: var(--shadow-accent);
+      transition: all var(--transition);
+      position: relative; overflow: hidden;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: -.2px;
+    }
+    #generate-btn::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.1) 0%, transparent 100%);
+    }
+    #generate-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(8,145,178,.42);
+    }
+    #generate-btn:active:not(:disabled) { transform: translateY(0); }
+    #generate-btn:disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+
+    /* Spinner */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Output Panel ──────────────────────────────────────── */
+    .output-panel { flex: 1; display: flex; flex-direction: column; gap: 0; overflow: hidden; }
+
+    /* Empty State */
+    #empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .empty-icon {
+      width: 72px; height: 72px;
+      background: var(--accent-soft);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+      opacity: .7;
+    }
+    .empty-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    .empty-desc { font-size: 13px; color: var(--text-muted); max-width: 260px; line-height: 1.6; }
+
+    /* MOM Output */
+    #mom-output-wrapper {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      gap: 0;
+      overflow: hidden;
+    }
+    #mom-output-wrapper.visible { display: flex; }
+
+    .output-actions-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 12px 0 14px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    .output-actions-left { display: flex; align-items: center; gap: 6px; }
+    .output-actions-right { display: flex; align-items: center; gap: 6px; }
+
+    .format-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(8,145,178,.25);
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: .3px;
+    }
+
+    #mom-text {
+      flex: 1;
+      min-height: 320px;
+      overflow-y: auto;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      line-height: 1.8;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      word-break: break-word;
+      scroll-behavior: smooth;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    #mom-text::-webkit-scrollbar { width: 6px; }
+    #mom-text::-webkit-scrollbar-track { background: transparent; }
+    #mom-text::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+    #mom-text::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* Copy Feedback */
+    #copy-feedback {
+      display: none;
+      align-items: center; gap: 6px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--success);
+      animation: fadeInOut 2s forwards;
+    }
+    @keyframes fadeInOut {
+      0%   { opacity: 0; transform: translateY(4px); }
+      15%  { opacity: 1; transform: translateY(0); }
+      75%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* ─── Tips Section ──────────────────────────────────────── */
+    .tips-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 24px;
+      transition: all var(--transition);
+    }
+    .tips-header {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 16px;
+    }
+    .tips-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, rgba(31,56,100,.1), var(--accent-soft));
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+    }
+    .tips-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .tips-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    .tip-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 13px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: all var(--transition);
+      cursor: default;
+    }
+    .tip-item:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+    .tip-emoji { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .tip-content {}
+    .tip-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -.1px;
+    }
+    .tip-desc { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.5; }
+
+    /* ─── Error Toast ────────────────────────────────────────── */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      min-width: 280px;
+      max-width: 380px;
+      pointer-events: all;
+      animation: slideInToast .3s cubic-bezier(.4,0,.2,1) forwards;
+      transition: opacity .3s;
+    }
+    .toast.error { border-left: 4px solid #ef4444; }
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.warning { border-left: 4px solid var(--warn-yellow); }
+    .toast-icon { flex-shrink: 0; margin-top: 1px; }
+    .toast-icon.error  { color: #ef4444; }
+    .toast-icon.success { color: var(--success); }
+    .toast-icon.warning { color: var(--warn-yellow); }
+    .toast-body { flex: 1; }
+    .toast-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+    .toast-msg { font-size: 12.5px; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; }
+    .toast-close {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border: none; cursor: pointer;
+      color: var(--text-muted); border-radius: 4px;
+      font-size: 16px; line-height: 1;
+    }
+    .toast-close:hover { background: var(--surface-alt); color: var(--text-primary); }
+    @keyframes slideInToast {
+      from { opacity: 0; transform: translateX(32px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ─── Loading Overlay on Output ─────────────────────────── */
+    .loading-overlay {
+      display: none;
+      position: absolute; inset: 0;
+      background: rgba(var(--surface), .85);
+      border-radius: var(--radius-md);
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 14px;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+    }
+    .loading-overlay.visible { display: flex; }
+    .loading-overlay-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 36px;
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+    .big-spinner {
+      width: 48px; height: 48px;
+      border: 4px solid var(--accent-soft);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    .loading-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .loading-sub { font-size: 12.5px; color: var(--text-muted); }
+
+    /* Output card needs relative position for overlay */
+    #output-card { position: relative; }
+
+    /* ─── Scrollbar global ──────────────────────────────────── */
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ─── Footer ─────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 16px 28px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    footer strong { color: var(--accent); font-weight: 600; }
+
+    /* ─── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .split-pane { grid-template-columns: 1fr; }
+      .topbar-inner { padding: 0 16px; }
+      .main-content { padding: 0 16px 24px; }
+      .page-header { padding: 20px 16px 12px; }
+      .company-badge { display: none; }
+      .page-header-right { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 560px) {
+      .brand-sub { display: none; }
+      .page-title { font-size: 20px; }
+      .format-group { flex-direction: column; align-items: flex-start; gap: 4px; }
+    }
+
+    /* ─── Accessibility ──────────────────────────────────────── */
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* ─── Shine animation on generate button ─────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    #generate-btn.loading-shimmer {
+      background-size: 200% auto;
+      background-image: linear-gradient(90deg, var(--primary) 0%, var(--accent) 40%, var(--accent-light) 60%, var(--primary) 100%);
+      animation: shimmer 1.5s linear infinite;
+    }
+
+    /* ─── Word/char count transition ────────────────────────── */
+    .stat-chip .val { transition: color .2s; }
+    .stat-chip.warn .val { color: var(--warn-yellow); }
+    .stat-chip.danger .val { color: var(--warn-red); }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════ TOP BAR -->
+  <header class="topbar" role="banner">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <a href="/" class="btn-back" id="back-btn" title="Back to Home">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </svg>
+          Back to Home
+        </a>
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">MOM Generator</span>
+          <span class="brand-sub">Secure Meters Ltd.</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="company-badge">
+          <span class="company-badge-dot"></span>
+          Secure Meters Ltd.
+        </div>
+        <button id="theme-toggle" title="Toggle dark/light mode" aria-label="Toggle theme">
+          <!-- Icon updated by JS -->
+          <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════ PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+      </div>
+      <div class="page-title-block">
+        <h1 class="page-title">Text Transcript</h1>
+        <p class="page-desc">Paste your meeting transcript and generate a structured Minutes of Meeting instantly.</p>
+      </div>
+    </div>
+    <div class="page-header-right">
+      <div class="format-group">
+        <span class="format-label">MOM Format:</span>
+        <select id="format-select" aria-label="Select MOM format">
+          <option value="standard">📋 Standard</option>
+          <option value="executive">👔 Executive</option>
+          <option value="agile">⚡ Agile / Sprint</option>
+          <option value="technical">🔧 Technical</option>
+          <option value="client">🤝 Client Meeting</option>
+          <option value="legal">⚖️ Legal / Formal</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ MAIN -->
+  <main class="main-content" role="main">
+
+    <!-- Split Pane -->
+    <div class="split-pane">
+
+      <!-- ── LEFT: Transcript Input ────────────────────────── -->
+      <div class="card" id="input-card">
+        <div class="card-header">
+          <div class="card-title-row">
+            <div class="card-icon cyan">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+            </div>
+            <span class="card-title">Meeting Transcript</span>
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-ghost btn-sm" id="paste-btn" title="Paste from clipboard">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              </svg>
+              Paste
+            </button>
+            <button class="btn btn-danger btn-sm" id="clear-btn" title="Clear transcript">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+              Clear
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Limit Warning Banner -->
+          <div class="limit-banner" id="limit-banner" role="alert">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span id="limit-banner-text">Approaching character limit.</span>
+          </div>
+
+          <!-- Textarea -->
+          <div class="textarea-wrapper">
+            <textarea
+              id="transcript-input"
+              placeholder="Paste or type your meeting transcript here…&#10;&#10;Tip: Include details like attendees, agenda items, discussions, and decisions for the best MOM output."
+              aria-label="Meeting transcript input"
+              spellcheck="true"
+            ></textarea>
+          </div>
+
+          <!-- Progress -->
+          <div class="limit-progress-track" aria-hidden="true">
+            <div class="limit-progress-fill" id="limit-progress"></div>
+          </div>
+
+          <!-- Stats -->
+          <div class="stat-row">
+            <div class="stat-chip" id="char-chip">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>
+              </svg>
+              <span>Characters: </span><span class="val" id="char-count">0</span>
+              <span style="color:var(--text-muted)">&nbsp;/ 1,000,000</span>
+            </div>
+            <div class="stat-chip" id="word-chip">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="15" y2="18"/>
+              </svg>
+              <span>Words: </span><span class="val" id="word-count">0</span>
+            </div>
+            <div class="stat-chip" id="line-chip">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+                <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+              </svg>
+              <span>Lines: </span><span class="val" id="line-count">0</span>
+            </div>
+          </div>
+
+          <!-- Generate Button -->
+          <button id="generate-btn" aria-label="Generate MOM">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            <span id="generate-btn-text">Generate MOM</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── RIGHT: MOM Output ─────────────────────────────── -->
+      <div class="card" id="output-card">
+        <div class="card-header">
+          <div class="card-title-row">
+            <div class="card-icon navy">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+            </div>
+            <span class="card-title">Generated MOM</span>
+          </div>
+          <div class="card-actions">
+            <div id="copy-feedback" role="status" aria-live="polite">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Copied!
+            </div>
+            <button class="btn btn-ghost btn-sm" id="copy-btn" title="Copy MOM to clipboard" style="display:none">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              Copy
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="output-panel">
+
+            <!-- Empty State -->
+            <div id="empty-state" aria-label="No MOM generated yet">
+              <div class="empty-icon">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+              </div>
+              <div class="empty-title">No MOM Generated Yet</div>
+              <div class="empty-desc">Paste your transcript on the left, select a format, and click <strong>Generate MOM</strong> to get started.</div>
+            </div>
+
+            <!-- MOM Output Wrapper -->
+            <div id="mom-output-wrapper" aria-live="polite" aria-atomic="true">
+              <div class="output-actions-bar">
+                <div class="output-actions-left">
+                  <span class="format-badge" id="active-format-badge">📋 Standard</span>
+                  <span style="font-size:12px;color:var(--text-muted);margin-left:4px;" id="mom-word-stat"></span>
+                </div>
+                <div class="output-actions-right">
+                  <button class="btn btn-secondary btn-sm" id="download-txt-btn" title="Download MOM as .txt">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    TXT
+                  </button>
+                  <button class="btn btn-primary btn-sm" id="download-docx-btn" title="Download DOCX Template">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    DOCX Template
+                  </button>
+                </div>
+              </div>
+
+              <!-- MOM Text -->
+              <pre id="mom-text" role="region" aria-label="Generated MOM content" tabindex="0"></pre>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loading-overlay" role="status" aria-live="polite" aria-label="Generating MOM">
+          <div class="loading-overlay-card">
+            <div class="big-spinner"></div>
+            <div class="loading-text">Generating MOM…</div>
+            <div class="loading-sub">AI is processing your transcript</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TIPS SECTION ─────────────────────────────────────── -->
+    <div class="tips-card">
+      <div class="tips-header">
+        <div class="tips-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div>
+          <div class="tips-title">What the AI Extracts from Your Transcript</div>
+          <div class="tips-subtitle">Include these details in your transcript for the best results</div>
+        </div>
+      </div>
+      <div class="tips-grid">
+        <div class="tip-item">
+          <div class="tip-emoji">📌</div>
+          <div class="tip-content">
+            <div class="tip-label">Topics Discussed</div>
+            <div class="tip-desc">Main agenda items and subjects covered in the meeting</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-emoji">💡</div>
+          <div class="tip-content">
+            <div class="tip-label">Key Points</div>
+            <div class="tip-desc">Important observations, highlights, and notable insights</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-emoji">✅</div>
+          <div class="tip-content">
+            <div class="tip-label">Decisions Made</div>
+            <div class="tip-desc">Approved resolutions, choices, and agreed-upon outcomes</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-emoji">📋</div>
+          <div class="tip-content">
+            <div class="tip-label">Action Items</div>
+            <div class="tip-desc">Tasks assigned with responsible owners and deadlines</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-emoji">🗓️</div>
+          <div class="tip-content">
+            <div class="tip-label">Next Steps</div>
+            <div class="tip-desc">Follow-ups, upcoming meetings, and future milestones</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-emoji">👥</div>
+          <div class="tip-content">
+            <div class="tip-label">Attendees</div>
+            <div class="tip-desc">Participants, their roles, and contributions in the meeting</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════ FOOTER -->
+  <footer>
+    <strong>MOM Generator</strong> &nbsp;·&nbsp; Secure Meters Ltd. &nbsp;·&nbsp; Internal Tool &nbsp;·&nbsp;
+    <span id="footer-year"></span>
+  </footer>
+
+  <!-- Toast Container -->
+  <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ JAVASCRIPT -->
+  <script>
+    'use strict';
+
+    // ── Constants ────────────────────────────────────────────
+    const API_BASE       = 'http://127.0.0.1:5001';
+    const MAX_CHARS      = 1_000_000;
+    const WARN_80        = Math.floor(MAX_CHARS * 0.80);
+    const WARN_95        = Math.floor(MAX_CHARS * 0.95);
+    const LS_THEME_KEY   = 'mom-theme';
+
+    // ── DOM Refs ─────────────────────────────────────────────
+    const html             = document.documentElement;
+    const themeToggle      = document.getElementById('theme-toggle');
+    const themeIcon        = document.getElementById('theme-icon');
+    const transcriptInput  = document.getElementById('transcript-input');
+    const charCount        = document.getElementById('char-count');
+    const wordCount        = document.getElementById('word-count');
+    const lineCount        = document.getElementById('line-count');
+    const charChip         = document.getElementById('char-chip');
+    const limitBanner      = document.getElementById('limit-banner');
+    const limitBannerText  = document.getElementById('limit-banner-text');
+    const limitProgress    = document.getElementById('limit-progress');
+    const clearBtn         = document.getElementById('clear-btn');
+    const pasteBtn         = document.getElementById('paste-btn');
+    const formatSelect     = document.getElementById('format-select');
+    const generateBtn      = document.getElementById('generate-btn');
+    const generateBtnText  = document.getElementById('generate-btn-text');
+    const emptyState       = document.getElementById('empty-state');
+    const momOutputWrapper = document.getElementById('mom-output-wrapper');
+    const momText          = document.getElementById('mom-text');
+    const copyBtn          = document.getElementById('copy-btn');
+    const copyFeedback     = document.getElementById('copy-feedback');
+    const downloadTxtBtn   = document.getElementById('download-txt-btn');
+    const downloadDocxBtn  = document.getElementById('download-docx-btn');
+    const loadingOverlay   = document.getElementById('loading-overlay');
+    const activeFormatBadge = document.getElementById('active-format-badge');
+    const momWordStat      = document.getElementById('mom-word-stat');
+    const toastContainer   = document.getElementById('toast-container');
+    const footerYear       = document.getElementById('footer-year');
+
+    // ── Footer year ──────────────────────────────────────────
+    footerYear.textContent = new Date().getFullYear();
+
+    // ── Theme ────────────────────────────────────────────────
+    const SUN_SVG = `<circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/>
+      <line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+    const MOON_SVG = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+
+    function applyTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      themeIcon.innerHTML = theme === 'dark' ? SUN_SVG : MOON_SVG;
+      themeToggle.title = theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+    }
+
+    function loadTheme() {
+      try {
+        const saved = localStorage.getItem(LS_THEME_KEY);
+        if (saved === 'dark' || saved === 'light') return saved;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } catch { return 'light'; }
+    }
+
+    function toggleTheme() {
+      const current = html.getAttribute('data-theme') || 'light';
+      const next    = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      try { localStorage.setItem(LS_THEME_KEY, next); } catch {}
+    }
+
+    // Init theme and settings
+    applyTheme(loadTheme());
+    themeToggle.addEventListener('click', toggleTheme);
+    
+    try {
+        const momSettings = JSON.parse(localStorage.getItem('momSettings') || '{}');
+        if (momSettings.defaultFormat && formatSelect) {
+            formatSelect.value = momSettings.defaultFormat;
+        }
+        if (momSettings.textMaxLength) {
+            MAX_CHARS = parseInt(momSettings.textMaxLength, 10);
+        }
+    } catch(e) {}
+
+    // Also listen for storage changes (cross-tab sync)
+    window.addEventListener('storage', e => {
+      if (e.key === LS_THEME_KEY && (e.newValue === 'light' || e.newValue === 'dark')) {
+        applyTheme(e.newValue);
+      }
+    });
+
+    // ── Stats & Limit ────────────────────────────────────────
+    function countWords(str) {
+      return str.trim() === '' ? 0 : str.trim().split(/\s+/).length;
+    }
+
+    function updateStats() {
+      const val  = transcriptInput.value;
+      const len  = val.length;
+      const words = countWords(val);
+      const lines = val === '' ? 0 : val.split('\n').length;
+
+      charCount.textContent = len.toLocaleString();
+      wordCount.textContent = words.toLocaleString();
+      lineCount.textContent = lines.toLocaleString();
+
+      // Progress bar
+      const pct = Math.min((len / MAX_CHARS) * 100, 100);
+      limitProgress.style.width = pct + '%';
+
+      // Colour progress & chip
+      if (len >= WARN_95) {
+        limitProgress.style.background = 'var(--warn-red)';
+        charChip.classList.add('danger');
+        charChip.classList.remove('warn');
+      } else if (len >= WARN_80) {
+        limitProgress.style.background = 'var(--warn-yellow)';
+        charChip.classList.add('warn');
+        charChip.classList.remove('danger');
+      } else {
+        limitProgress.style.background = 'var(--accent)';
+        charChip.classList.remove('warn', 'danger');
+      }
+
+      // Banner
+      limitBanner.className = 'limit-banner';
+      if (len >= WARN_95) {
+        limitBanner.classList.add('warn-95');
+        limitBannerText.textContent = `⚠️ Nearly at the 1,000,000 character limit! ${(MAX_CHARS - len).toLocaleString()} characters remaining.`;
+      } else if (len >= WARN_80) {
+        limitBanner.classList.add('warn-80');
+        limitBannerText.textContent = `You've used 80%+ of the character limit. ${(MAX_CHARS - len).toLocaleString()} characters remaining.`;
+      }
+
+      // Hard cap
+      if (len > MAX_CHARS) {
+        transcriptInput.value = val.slice(0, MAX_CHARS);
+        updateStats();
+      }
+    }
+
+    transcriptInput.addEventListener('input', updateStats);
+    updateStats();
+
+    // ── Clear ────────────────────────────────────────────────
+    clearBtn.addEventListener('click', () => {
+      if (transcriptInput.value === '') return;
+      transcriptInput.value = '';
+      updateStats();
+      transcriptInput.focus();
+    });
+
+    // ── Paste from Clipboard ─────────────────────────────────
+    pasteBtn.addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        transcriptInput.value = text;
+        updateStats();
+        transcriptInput.focus();
+        showToast('success', 'Pasted!', 'Clipboard content pasted into the transcript.');
+      } catch (err) {
+        showToast('error', 'Paste Failed', 'Could not read clipboard. Please paste manually using Ctrl+V.');
+      }
+    });
+
+    // ── Format Label Map ─────────────────────────────────────
+    const FORMAT_LABELS = {
+      standard:  '📋 Standard',
+      executive: '👔 Executive',
+      agile:     '⚡ Agile / Sprint',
+      technical: '🔧 Technical',
+      client:    '🤝 Client Meeting',
+      legal:     '⚖️ Legal / Formal',
+    };
+
+    // ── Generate MOM ─────────────────────────────────────────
+    generateBtn.addEventListener('click', generateMOM);
+
+    async function generateMOM() {
+      const transcript = transcriptInput.value.trim();
+      if (!transcript) {
+        showToast('warning', 'Empty Transcript', 'Please paste or type your meeting transcript first.');
+        transcriptInput.focus();
+        return;
+      }
+      if (transcript.length < 20) {
+        showToast('warning', 'Too Short', 'Please provide a more detailed transcript for meaningful results.');
+        transcriptInput.focus();
+        return;
+      }
+
+      const format = formatSelect.value;
+      setGenerating(true);
+
+      try {
+        const momSettings = JSON.parse(localStorage.getItem('momSettings') || '{}');
+        const res = await fetch(`${API_BASE}/api/v1/generate-from-text`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+              transcript: transcript, 
+              format,
+              word_limit: momSettings.momWordLimit || 1000,
+              include_action_items: momSettings.includeActionItems !== false
+          }),
+        });
+
+        if (!res.ok) {
+          let errMsg = `Server responded with status ${res.status}`;
+          try {
+            const errData = await res.json();
+            if (errData.error || errData.message) errMsg = errData.error || errData.message;
+          } catch {}
+          throw new Error(errMsg);
+        }
+
+        const data = await res.json();
+        const momContent = data.mom || data.result || data.output || data.data || '';
+
+        if (!momContent) throw new Error('Server returned empty MOM. Please try again.');
+
+        displayMOM(momContent, format);
+        showToast('success', 'MOM Generated!', `Your ${FORMAT_LABELS[format]} MOM is ready.`);
+
+      } catch (err) {
+        showToast('error', 'Generation Failed', err.message || 'Failed to connect to the server. Ensure the backend is running at port 5001.');
+      } finally {
+        setGenerating(false);
+      }
+    }
+
+    function setGenerating(state) {
+      generateBtn.disabled = state;
+      loadingOverlay.classList.toggle('visible', state);
+      if (state) {
+        generateBtnText.textContent = 'Generating…';
+        generateBtn.classList.add('loading-shimmer');
+      } else {
+        generateBtnText.textContent = 'Generate MOM';
+        generateBtn.classList.remove('loading-shimmer');
+      }
+    }
+
+    function displayMOM(content, format) {
+      momText.textContent = content;
+      emptyState.style.display = 'none';
+      momOutputWrapper.classList.add('visible');
+      copyBtn.style.display = 'inline-flex';
+
+      // Badge & word stat
+      activeFormatBadge.textContent = FORMAT_LABELS[format] || format;
+      const wc = countWords(content);
+      momWordStat.textContent = `${wc.toLocaleString()} words · ${content.length.toLocaleString()} chars`;
+
+      // Scroll output into view on mobile
+      if (window.innerWidth < 900) {
+        document.getElementById('output-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // ── Copy to Clipboard ────────────────────────────────────
+    copyBtn.addEventListener('click', async () => {
+      const text = momText.textContent;
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.style.display = 'none';
+        copyFeedback.style.display = 'flex';
+        setTimeout(() => {
+          copyFeedback.style.display = 'none';
+          copyBtn.style.display = 'inline-flex';
+        }, 2200);
+      } catch {
+        showToast('error', 'Copy Failed', 'Could not copy to clipboard. Please select and copy manually.');
+      }
+    });
+
+    // ── Download TXT ─────────────────────────────────────────
+    downloadTxtBtn.addEventListener('click', () => {
+      const text = momText.textContent;
+      if (!text) { showToast('warning', 'Nothing to Download', 'Generate a MOM first.'); return; }
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      const ts   = new Date().toISOString().slice(0, 10);
+      a.href     = url;
+      a.download = `MOM_${ts}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('success', 'Downloaded!', 'MOM saved as .txt file.');
+    });
+
+    // ── Download DOCX ─────────────────────────────────────────
+    downloadDocxBtn.addEventListener('click', downloadDOCX);
+
+    async function downloadDOCX() {
+      const text = momText.textContent;
+      if (!text) { showToast('warning', 'Nothing to Download', 'Generate a MOM first.'); return; }
+
+      downloadDocxBtn.disabled = true;
+      const origHtml = downloadDocxBtn.innerHTML;
+      downloadDocxBtn.innerHTML = `<div class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;width:13px;height:13px;border-width:2px;"></div> Preparing…`;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/export/template`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+
+        if (!res.ok) {
+          let errMsg = `Server error ${res.status}`;
+          try {
+            const d = await res.json();
+            errMsg = d.error || d.message || errMsg;
+          } catch {}
+          throw new Error(errMsg);
+        }
+
+        // Try to get filename from headers
+        const disposition = res.headers.get('Content-Disposition') || '';
+        let filename = 'MOM_Template.docx';
+        const match  = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (match) filename = match[1].replace(/['"]/g, '');
+
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('success', 'DOCX Downloaded!', 'Your MOM template has been downloaded.');
+
+      } catch (err) {
+        showToast('error', 'Download Failed', err.message || 'Could not download DOCX. Check that the server is running.');
+      } finally {
+        downloadDocxBtn.disabled = false;
+        downloadDocxBtn.innerHTML = origHtml;
+      }
+    }
+
+    // ── Toast System ─────────────────────────────────────────
+    const TOAST_ICONS = {
+      success: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+      error:   `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+      warning: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+    };
+
+    function showToast(type, title, message, duration = 4500) {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.setAttribute('role', 'alert');
+      toast.innerHTML = `
+        <div class="toast-icon ${type}">${TOAST_ICONS[type] || ''}</div>
+        <div class="toast-body">
+          <div class="toast-title">${escHtml(title)}</div>
+          ${message ? `<div class="toast-msg">${escHtml(message)}</div>` : ''}
+        </div>
+        <button class="toast-close" aria-label="Dismiss notification">×</button>
+      `;
+      toastContainer.appendChild(toast);
+      const closeBtn = toast.querySelector('.toast-close');
+      const remove = () => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); };
+      closeBtn.addEventListener('click', remove);
+      setTimeout(remove, duration);
+    }
+
+    function escHtml(str) {
+      const d = document.createElement('div');
+      d.appendChild(document.createTextNode(str));
+      return d.innerHTML;
+    }
+
+    // ── Keyboard shortcut: Ctrl+Enter to generate ─────────────
+    transcriptInput.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        generateMOM();
+      }
+    });
+
+    // ── Drag-and-drop text files onto textarea ─────────────────
+    transcriptInput.addEventListener('dragover', e => { e.preventDefault(); transcriptInput.style.borderColor = 'var(--accent)'; });
+    transcriptInput.addEventListener('dragleave', () => { transcriptInput.style.borderColor = ''; });
+    transcriptInput.addEventListener('drop', e => {
+      e.preventDefault();
+      transcriptInput.style.borderColor = '';
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        const file = files[0];
+        if (file.type.startsWith('text/') || file.name.endsWith('.txt') || file.name.endsWith('.md')) {
+          const reader = new FileReader();
+          reader.onload = ev => {
+            transcriptInput.value = ev.target.result;
+            updateStats();
+            showToast('success', 'File Loaded', `"${file.name}" has been loaded into the transcript.`);
+          };
+          reader.onerror = () => showToast('error', 'Read Error', 'Could not read the dropped file.');
+          reader.readAsText(file);
+        } else {
+          showToast('warning', 'Unsupported File', 'Only plain text (.txt, .md) files can be dropped here.');
+        }
+      } else if (e.dataTransfer.getData('text')) {
+        transcriptInput.value = e.dataTransfer.getData('text');
+        updateStats();
+      }
+    });
+
+  </script>
+</body>
+</html>

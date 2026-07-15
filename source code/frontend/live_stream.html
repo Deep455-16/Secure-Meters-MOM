@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Stream ASR — MOM Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── CSS Custom Properties ─────────────────────────────────────── */
+    :root {
+      --primary:        #1F3864;
+      --primary-light:  #2a4d8f;
+      --primary-dark:   #152847;
+      --accent:         #E8A020;
+      --accent-light:   #f5b93a;
+      --accent-dark:    #c9871a;
+
+      --bg:             #f0f4f8;
+      --bg-secondary:   #e2e8f0;
+      --card-bg:        rgba(255, 255, 255, 0.82);
+      --card-border:    rgba(31, 56, 100, 0.12);
+      --card-shadow:    0 8px 32px rgba(31, 56, 100, 0.10);
+
+      --text:           #1a2236;
+      --text-muted:     #64748b;
+      --text-light:     #94a3b8;
+
+      --topbar-bg:      rgba(255, 255, 255, 0.72);
+      --topbar-border:  rgba(31, 56, 100, 0.10);
+
+      --input-bg:       rgba(255,255,255,0.9);
+      --input-border:   rgba(31, 56, 100, 0.18);
+
+      --success:        #10b981;
+      --warning:        #f59e0b;
+      --danger:         #ef4444;
+      --info:           #3b82f6;
+
+      --radius-sm:      8px;
+      --radius:         14px;
+      --radius-lg:      20px;
+      --radius-xl:      28px;
+
+      --transition:     all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg:             #0d1526;
+      --bg-secondary:   #111d35;
+      --card-bg:        rgba(20, 35, 70, 0.72);
+      --card-border:    rgba(232, 160, 32, 0.12);
+      --card-shadow:    0 8px 32px rgba(0, 0, 0, 0.40);
+
+      --text:           #e8edf5;
+      --text-muted:     #94a3b8;
+      --text-light:     #64748b;
+
+      --topbar-bg:      rgba(13, 21, 38, 0.88);
+      --topbar-border:  rgba(232, 160, 32, 0.10);
+
+      --input-bg:       rgba(20, 35, 70, 0.80);
+      --input-border:   rgba(232, 160, 32, 0.20);
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.35s ease, color 0.35s ease;
+      overflow-x: hidden;
+    }
+
+    /* ─── Animated Background ────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 10%, rgba(31,56,100,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 80%, rgba(232,160,32,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(31,56,100,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    [data-theme="dark"] body::before {
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 10%, rgba(31,56,100,0.30) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 80%, rgba(232,160,32,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(31,56,100,0.15) 0%, transparent 70%);
+    }
+
+    /* ─── Top Bar ────────────────────────────────────────────────────── */
+    #topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 24px;
+      height: 62px;
+      background: var(--topbar-bg);
+      border-bottom: 1px solid var(--topbar-border);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      transition: var(--transition);
+    }
+
+    #back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    #back-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(31,56,100,0.25);
+    }
+    #back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .topbar-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    .topbar-title .brand {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.2px;
+    }
+    [data-theme="dark"] .topbar-title .brand { color: var(--accent); }
+
+    .topbar-title .sep {
+      width: 1px;
+      height: 18px;
+      background: var(--card-border);
+      flex-shrink: 0;
+    }
+    .topbar-title .page-name {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    /* Theme Toggle */
+    #theme-toggle {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      background: var(--bg-secondary);
+      border: 1.5px solid var(--card-border);
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+    #theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      transition: var(--transition);
+    }
+    [data-theme="dark"] #theme-toggle::after {
+      left: calc(100% - 23px);
+      background: var(--accent);
+    }
+    .theme-icon {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
+      pointer-events: none;
+    }
+    .theme-icon svg { width: 12px; height: 12px; }
+
+    /* ─── Main Layout ────────────────────────────────────────────────── */
+    .main-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ─── Page Header ────────────────────────────────────────────────── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .page-header-inner {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .page-icon-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(31,56,100,0.30);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-icon-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+      border-radius: 50%;
+    }
+    .page-icon-wrap svg { width: 30px; height: 30px; color: #fff; position: relative; z-index: 1; }
+
+    .page-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+    [data-theme="dark"] .page-title {
+      background: linear-gradient(135deg, #7aa3e0 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .page-subtitle {
+      font-size: 14.5px;
+      color: var(--text-muted);
+      max-width: 420px;
+      line-height: 1.5;
+    }
+
+    /* ─── Control Bar ────────────────────────────────────────────────── */
+    #control-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 18px 22px;
+      border-radius: var(--radius-lg);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      margin-bottom: 24px;
+      transition: var(--transition);
+    }
+
+    /* Record Button */
+    #record-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 28px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(31,56,100,0.32);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    #record-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+    }
+    #record-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(31,56,100,0.40);
+    }
+    #record-btn:active:not(:disabled) { transform: translateY(0); }
+    #record-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    #record-btn.recording {
+      background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+      box-shadow: 0 4px 18px rgba(239,68,68,0.40);
+    }
+    #record-btn.recording:hover:not(:disabled) {
+      box-shadow: 0 8px 28px rgba(239,68,68,0.50);
+    }
+
+    .rec-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fff;
+      flex-shrink: 0;
+    }
+    #record-btn.recording .rec-dot {
+      animation: pulse-dot 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* Timer */
+    #timer-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+      border: 1px solid var(--input-border);
+      min-width: 110px;
+      transition: var(--transition);
+    }
+    #timer-wrap.active {
+      background: rgba(239,68,68,0.08);
+      border-color: rgba(239,68,68,0.30);
+    }
+    .timer-live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-light);
+      transition: background 0.3s;
+    }
+    #timer-wrap.active .timer-live-dot {
+      background: var(--danger);
+      animation: pulse-dot 1s ease-in-out infinite;
+    }
+    #timer-display {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      transition: color 0.3s;
+    }
+    #timer-wrap.active #timer-display { color: var(--danger); }
+
+    /* Language Selector */
+    .lang-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    #lang-select {
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: var(--transition);
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 34px;
+    }
+    #lang-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(31,56,100,0.12);
+    }
+
+    /* Status Indicator */
+    #status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-left: auto;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--card-border);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    #status-indicator.idle     { color: var(--text-muted); }
+    #status-indicator.active   { color: var(--danger); background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.20); }
+    #status-indicator.success  { color: var(--success); background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.20); }
+    #status-indicator.error    { color: var(--danger); background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.20); }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+    #status-indicator.active .status-dot { animation: pulse-dot 1s ease-in-out infinite; }
+
+    /* ─── Two-column grid ────────────────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 860px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ─── Card ───────────────────────────────────────────────────────── */
+    .card {
+      border-radius: var(--radius-lg);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .card:hover { box-shadow: 0 12px 42px rgba(31,56,100,0.14); }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--card-border);
+      background: linear-gradient(135deg, rgba(31,56,100,0.04) 0%, transparent 100%);
+      flex-shrink: 0;
+    }
+    .card-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(31,56,100,0.25);
+    }
+    .card-icon svg { width: 17px; height: 17px; color: #fff; }
+
+    .card-title-wrap { flex: 1; min-width: 0; }
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .card-subtitle {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .card-actions { display: flex; align-items: center; gap: 8px; }
+
+    .card-body {
+      flex: 1;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* ─── Transcript Panel ───────────────────────────────────────────── */
+    #transcript-panel {
+      min-height: 320px;
+      max-height: 420px;
+    }
+
+    #transcript-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 20px;
+      font-size: 14.5px;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 0;
+    }
+    #transcript-box::-webkit-scrollbar { width: 5px; }
+    #transcript-box::-webkit-scrollbar-track { background: transparent; }
+    #transcript-box::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
+
+    .transcript-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 220px;
+      color: var(--text-light);
+      text-align: center;
+    }
+    .transcript-placeholder svg { width: 40px; height: 40px; opacity: 0.35; }
+    .transcript-placeholder p { font-size: 13.5px; line-height: 1.5; max-width: 200px; }
+
+    /* Live text word highlight */
+    .live-word {
+      background: linear-gradient(135deg, rgba(232,160,32,0.20), rgba(232,160,32,0.05));
+      border-radius: 3px;
+      padding: 0 2px;
+      animation: fadeword 1.5s ease forwards;
+    }
+    @keyframes fadeword {
+      0%   { background-color: rgba(232,160,32,0.28); }
+      100% { background-color: transparent; }
+    }
+
+    /* Transcript Footer */
+    #transcript-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-top: 1px solid var(--card-border);
+      background: rgba(0,0,0,0.02);
+      flex-shrink: 0;
+    }
+    .word-count {
+      font-size: 12px;
+      color: var(--text-light);
+      flex: 1;
+    }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .icon-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .icon-btn svg { width: 15px; height: 15px; }
+
+    /* ─── MOM Panel ──────────────────────────────────────────────────── */
+    #mom-panel { min-height: 320px; max-height: 420px; }
+
+    #mom-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 20px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 0;
+    }
+    #mom-box::-webkit-scrollbar { width: 5px; }
+    #mom-box::-webkit-scrollbar-track { background: transparent; }
+    #mom-box::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
+
+    /* ─── Action Bar ─────────────────────────────────────────────────── */
+    #action-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 18px 22px;
+      border-radius: var(--radius-lg);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* ─── Buttons ────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn:disabled:hover { transform: none; box-shadow: none; }
+
+    .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(31,56,100,0.28);
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(31,56,100,0.36);
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 100%);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(232,160,32,0.30);
+    }
+    .btn-accent:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232,160,32,0.40);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1.5px solid var(--card-border);
+    }
+    .btn-outline::before { display: none; }
+    .btn-outline:hover:not(:disabled) {
+      background: var(--bg-secondary);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+
+    /* Spinner */
+    .spinner {
+      display: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    .spinning .spinner { display: block; }
+    .spinning .btn-icon { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Toast ──────────────────────────────────────────────────────── */
+    #toast-container {
+      position: fixed;
+      bottom: 28px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: var(--radius);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+      backdrop-filter: blur(20px);
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text);
+      max-width: 340px;
+      pointer-events: all;
+      animation: slideInToast 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .toast.hide { animation: slideOutToast 0.3s ease forwards; }
+    @keyframes slideInToast {
+      from { opacity: 0; transform: translateX(60px) scale(0.92); }
+      to   { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    @keyframes slideOutToast {
+      from { opacity: 1; transform: translateX(0) scale(1); }
+      to   { opacity: 0; transform: translateX(60px) scale(0.92); }
+    }
+    .toast-icon { width: 18px; height: 18px; flex-shrink: 0; }
+    .toast.success .toast-icon { color: var(--success); }
+    .toast.error   .toast-icon { color: var(--danger); }
+    .toast.info    .toast-icon { color: var(--info); }
+    .toast.warning .toast-icon { color: var(--warning); }
+
+    /* ─── Loading overlay ────────────────────────────────────────────── */
+    .panel-loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 36px 20px;
+      color: var(--text-muted);
+      font-size: 13.5px;
+    }
+    .panel-loading.show { display: flex; }
+    .panel-loading .spin-ring {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 3px solid var(--card-border);
+      border-top-color: var(--primary);
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* ─── Error banner ───────────────────────────────────────────────── */
+    .error-banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      margin: 12px 18px;
+      border-radius: var(--radius-sm);
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .error-banner.show { display: flex; }
+    .error-banner svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* ─── MOM content formatting ─────────────────────────────────────── */
+    #mom-box h1, #mom-box h2, #mom-box h3 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+    [data-theme="dark"] #mom-box h1,
+    [data-theme="dark"] #mom-box h2,
+    [data-theme="dark"] #mom-box h3 { color: var(--accent); }
+    #mom-box h1 { font-size: 18px; }
+    #mom-box h2 { font-size: 16px; }
+    #mom-box h3 { font-size: 14.5px; }
+    #mom-box strong { color: var(--primary); }
+    [data-theme="dark"] #mom-box strong { color: var(--accent-light); }
+    #mom-box ul, #mom-box ol { padding-left: 20px; margin: 8px 0; }
+    #mom-box li { margin-bottom: 4px; }
+    #mom-box hr {
+      border: none;
+      border-top: 1px solid var(--card-border);
+      margin: 12px 0;
+    }
+
+    /* ─── Pulse recording ring ───────────────────────────────────────── */
+    @keyframes ripple {
+      0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.30); }
+      70%  { box-shadow: 0 0 0 14px rgba(239,68,68,0); }
+      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    }
+    #record-btn.recording { animation: ripple 1.5s ease-out infinite; }
+
+    /* ─── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .main-wrap { padding: 20px 12px 50px; }
+      #topbar { padding: 0 14px; }
+      #control-bar, #action-bar { padding: 14px 16px; }
+      .btn { padding: 9px 16px; font-size: 13px; }
+      #record-btn { padding: 10px 20px; font-size: 14px; }
+      #status-indicator { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════ TOP BAR -->
+  <header id="topbar">
+    <a id="back-btn" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Back to Home
+    </a>
+
+    <div class="topbar-title">
+      <div class="sep"></div>
+      <span class="page-name">Live Stream ASR</span>
+    </div>
+
+    <div class="topbar-right">
+      <button id="theme-toggle" aria-label="Toggle theme" title="Toggle dark/light mode">
+        <span class="theme-icon">
+          <!-- Sun -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <!-- Moon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════ MAIN -->
+  <main class="main-wrap">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="page-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+            <line x1="8" y1="22" x2="16" y2="22"/>
+          </svg>
+        </div>
+        <h1 class="page-title">Live Stream ASR</h1>
+        <p class="page-subtitle">Real-time automatic speech recognition — speak and watch your words appear instantly.</p>
+      </div>
+    </div>
+
+    <!-- Control Bar -->
+    <div id="control-bar">
+
+      <!-- Record Toggle -->
+      <button id="record-btn" aria-label="Start recording">
+        <span class="rec-dot"></span>
+        <span id="record-btn-label">Start Recording</span>
+      </button>
+
+      <!-- Timer -->
+      <div id="timer-wrap" aria-live="off">
+        <span class="timer-live-dot"></span>
+        <span id="timer-display">00:00:00</span>
+      </div>
+
+      <!-- Language -->
+      <span class="lang-label">Language:</span>
+      <select id="lang-select" aria-label="Select language">
+        <option value="en-IN">English</option>
+        <option value="hi-IN">Hinglish</option>
+      </select>
+
+      <!-- Status -->
+      <div id="status-indicator" class="idle" role="status" aria-live="polite">
+        <span class="status-dot"></span>
+        <span id="status-text">Idle</span>
+      </div>
+    </div>
+
+    <!-- Two Column: Transcript + MOM -->
+    <div class="two-col">
+
+      <!-- Transcript Card -->
+      <div class="card" id="transcript-panel">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="card-title-wrap">
+            <div class="card-title">Live Transcript</div>
+            <div class="card-subtitle">Real-time speech-to-text output</div>
+          </div>
+          <div class="card-actions">
+            <button class="icon-btn" id="clear-transcript-btn" title="Clear transcript" aria-label="Clear transcript">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>
+                <path d="M9 6V4h6v2"/>
+              </svg>
+            </button>
+            <button class="icon-btn" id="copy-transcript-btn" title="Copy transcript" aria-label="Copy transcript">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Error banner -->
+          <div class="error-banner" id="transcript-error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span id="transcript-error-text">Could not connect to stream.</span>
+          </div>
+
+          <!-- Content area -->
+          <div id="transcript-box" aria-live="polite" aria-label="Live transcript">
+            <div class="transcript-placeholder" id="transcript-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+              </svg>
+              <p>Press <strong>Start Recording</strong> to begin live transcription</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="transcript-footer">
+          <span class="word-count" id="word-count">0 words</span>
+          <span style="font-size:11.5px; color:var(--text-light);" id="stream-mode-label">Stream: EventSource</span>
+        </div>
+      </div>
+
+      <!-- MOM Card -->
+      <div class="card" id="mom-panel">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <div class="card-title-wrap">
+            <div class="card-title">Generated MOM</div>
+            <div class="card-subtitle">Minutes of Meeting — AI generated</div>
+          </div>
+          <div class="card-actions">
+            <button class="icon-btn" id="copy-mom-btn" title="Copy MOM" aria-label="Copy MOM">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="panel-loading" id="mom-loading">
+            <div class="spin-ring"></div>
+            <span>Generating MOM…</span>
+          </div>
+          <div class="error-banner" id="mom-error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span id="mom-error-text">Failed to generate MOM.</span>
+          </div>
+          <div id="mom-box" aria-live="polite" aria-label="Generated MOM">
+            <div class="transcript-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              <p>Click <strong>Generate MOM</strong> after recording to get your meeting minutes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.two-col -->
+
+    <!-- Action Bar -->
+    <div id="action-bar">      <button class="btn btn-secondary" id="download-txt-btn" disabled>
+        <span class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </span>
+        Download MOM
+      </button>
+
+      <button class="btn btn-accent" id="export-docx-btn" disabled>
+        <span class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </span>
+        <div class="spinner"></div>
+        Generate Template (DOCX)
+      </button>
+
+      <button class="btn btn-outline" id="clear-all-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+        </svg>
+        Clear All
+      </button>
+
+      <div style="margin-left:auto; font-size:12px; color:var(--text-light); text-align:right; line-height:1.4;">
+        <div id="api-base-label">API: http://127.0.0.1:5001</div>
+        <div id="last-action-label" style="color:var(--text-light);">No action yet</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Toast Container -->
+  <div id="toast-container" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- ═══════════════════════════════════════════════════════  <!-- ✨ SCRIPTS -->
+  <script src="/socket.io.min.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── Config ─────────────────────────────────────────────────────── */
+    const API_BASE  = 'http://127.0.0.1:5001';
+    const WS_BASE   = 'ws://127.0.0.1:5001';
+    const SSE_URL   = `${API_BASE}/api/v1/stream/transcript`;
+    const WS_URL    = `${WS_BASE}/ws`;
+
+    /* ── State ──────────────────────────────────────────────────────── */
+    let isRecording   = false;
+    let transcript    = '';
+    let momText       = '';
+    let timerInterval = null;
+    let elapsedSecs   = 0;
+    let eventSource   = null;
+    let wsClient      = null;
+    let streamMode    = 'sse';   // 'sse' | 'ws'
+
+    /* ── DOM refs ───────────────────────────────────────────────────── */
+    const recordBtn          = document.getElementById('record-btn');
+    const recordBtnLabel     = document.getElementById('record-btn-label');
+    const timerWrap          = document.getElementById('timer-wrap');
+    const timerDisplay       = document.getElementById('timer-display');
+    const langSelect         = document.getElementById('lang-select');
+    const statusIndicator    = document.getElementById('status-indicator');
+    const statusText         = document.getElementById('status-text');
+    const transcriptBox      = document.getElementById('transcript-box');
+    const transcriptPlaceholder = document.getElementById('transcript-placeholder');
+    const transcriptError    = document.getElementById('transcript-error');
+    const transcriptErrorTxt = document.getElementById('transcript-error-text');
+    const transcriptFooter   = document.getElementById('transcript-footer');
+    const wordCountEl        = document.getElementById('word-count');
+    const streamModeLabel    = document.getElementById('stream-mode-label');
+    const momBox             = document.getElementById('mom-box');
+    const momLoading         = document.getElementById('mom-loading');
+    const momError           = document.getElementById('mom-error');
+    const momErrorTxt        = document.getElementById('mom-error-text');
+    const downloadTxtBtn     = document.getElementById('download-txt-btn');
+    const exportDocxBtn      = document.getElementById('export-docx-btn');
+    const clearAllBtn        = document.getElementById('clear-all-btn');
+    const clearTranscriptBtn = document.getElementById('clear-transcript-btn');
+    const copyTranscriptBtn  = document.getElementById('copy-transcript-btn');
+    const copyMomBtn         = document.getElementById('copy-mom-btn');
+    const themeToggle        = document.getElementById('theme-toggle');
+    const lastActionLabel    = document.getElementById('last-action-label');
+    const toastContainer     = document.getElementById('toast-container');
+
+    /* ══════════════════════════════════════════════════════════════════
+       THEME
+    ══════════════════════════════════════════════════════════════════ */
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('mom-theme', theme);
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem('mom-theme');
+      applyTheme(saved === 'dark' ? 'dark' : 'light');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    initTheme();
+
+    /* ══════════════════════════════════════════════════════════════════
+       TOAST
+    ══════════════════════════════════════════════════════════════════ */
+    function showToast(message, type = 'info', duration = 4000) {
+      const icons = {
+        success: `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+        error:   `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+        warning: `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+        info:    `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+      };
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.innerHTML = `${icons[type] || icons.info}<span>${message}</span>`;
+      toastContainer.appendChild(t);
+      setTimeout(() => {
+        t.classList.add('hide');
+        setTimeout(() => t.remove(), 320);
+      }, duration);
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       STATUS
+    ══════════════════════════════════════════════════════════════════ */
+    function setStatus(label, type = 'idle') {
+      statusIndicator.className = type;
+      statusText.textContent = label;
+    }
+
+    function setLastAction(msg) {
+      const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      lastActionLabel.textContent = `${now} — ${msg}`;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       TIMER
+    ══════════════════════════════════════════════════════════════════ */
+    function formatTime(secs) {
+      const h = String(Math.floor(secs / 3600)).padStart(2, '0');
+      const m = String(Math.floor((secs % 3600) / 60)).padStart(2, '0');
+      const s = String(secs % 60).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    function startTimer() {
+      elapsedSecs = 0;
+      timerDisplay.textContent = formatTime(0);
+      timerWrap.classList.add('active');
+      timerInterval = setInterval(() => {
+        elapsedSecs++;
+        timerDisplay.textContent = formatTime(elapsedSecs);
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerWrap.classList.remove('active');
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       TRANSCRIPT HELPERS
+    ══════════════════════════════════════════════════════════════════ */
+    function hidePlaceholder() {
+      if (transcriptPlaceholder) transcriptPlaceholder.style.display = 'none';
+    }
+
+    function updateWordCount() {
+      const words = transcript.trim() ? transcript.trim().split(/\s+/).length : 0;
+      wordCountEl.textContent = `${words} word${words !== 1 ? 's' : ''}`;
+    }
+
+    function appendTranscriptText(text) {
+      if (!text) return;
+      hidePlaceholder();
+      transcript += (transcript ? ' ' : '') + text;
+
+      // Render with highlighted last word
+      const escaped = escapeHtml(transcript);
+      const words   = escaped.split(' ');
+      if (words.length > 0) {
+        const last = words[words.length - 1];
+        words[words.length - 1] = `<span class="live-word">${last}</span>`;
+      }
+      transcriptBox.innerHTML = words.join(' ');
+      transcriptBox.scrollTop = transcriptBox.scrollHeight;
+      updateWordCount();
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SSE STREAM
+    ══════════════════════════════════════════════════════════════════ */
+    function startSSE() {
+      streamMode = 'sse';
+      streamModeLabel.textContent = 'Stream: EventSource';
+      transcriptError.classList.remove('show');
+
+      try {
+        const lang = langSelect.value;
+        eventSource = new EventSource(`${SSE_URL}?lang=${encodeURIComponent(lang)}`);
+
+        eventSource.onmessage = (e) => {
+          let data;
+          try { data = JSON.parse(e.data); } catch { data = { text: e.data }; }
+          const text = data.text || data.transcript || '';
+          if (text) appendTranscriptText(text);
+        };
+
+        eventSource.addEventListener('transcript', (e) => {
+          let data;
+          try { data = JSON.parse(e.data); } catch { data = { text: e.data }; }
+          const text = data.text || data.transcript || '';
+          if (text) appendTranscriptText(text);
+        });
+
+        eventSource.onerror = () => {
+          // Try WebSocket fallback
+          eventSource && eventSource.close();
+          eventSource = null;
+          startWebSocket();
+        };
+      } catch (err) {
+        startWebSocket();
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       WEBSOCKET STREAM (fallback / socket.io-like)
+    ══════════════════════════════════════════════════════════════════ */
+    function startWebSocket() {
+      streamMode = 'ws';
+      streamModeLabel.textContent = 'Stream: WebSocket';
+      transcriptError.classList.remove('show');
+
+      try {
+        wsClient = new WebSocket(WS_URL);
+
+        wsClient.onopen = () => {
+          const lang = langSelect.value;
+          wsClient.send(JSON.stringify({ type: 'start', lang }));
+        };
+
+        wsClient.onmessage = (e) => {
+          let data;
+          try { data = JSON.parse(e.data); } catch { data = { text: e.data }; }
+          const text = data.text || data.transcript || '';
+          if (text) appendTranscriptText(text);
+        };
+
+        wsClient.onerror = () => {
+          streamModeLabel.textContent = 'Stream: Polling';
+          startPolling();
+        };
+
+        wsClient.onclose = () => {
+          if (isRecording) {
+            showToast('WebSocket disconnected.', 'warning');
+          }
+        };
+      } catch (err) {
+        startPolling();
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       POLLING FALLBACK
+    ══════════════════════════════════════════════════════════════════ */
+    let pollInterval = null;
+    let lastPollIndex = 0;
+
+    function startPolling() {
+      streamMode = 'poll';
+      streamModeLabel.textContent = 'Stream: Polling';
+      lastPollIndex = 0;
+
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`${API_BASE}/api/v1/stream/transcript?from=${lastPollIndex}&lang=${langSelect.value}`);
+          if (!res.ok) return;
+          const json = await res.json();
+          const text = json.text || json.transcript || '';
+          if (text) {
+            appendTranscriptText(text);
+            lastPollIndex = json.index || (lastPollIndex + 1);
+          }
+        } catch { /* silent */ }
+      }, 1200);
+    }
+
+    function stopPolling() {
+      clearInterval(pollInterval);
+      pollInterval = null;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       STOP ALL STREAMS
+    ══════════════════════════════════════════════════════════════════ */
+    function stopAllStreams() {
+      if (eventSource) { eventSource.close(); eventSource = null; }
+      if (wsClient)    { wsClient.close();    wsClient = null; }
+      stopPolling();
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       RECORDING TOGGLE
+    ══════════════════════════════════════════════════════════════════ */
+    recordBtn.addEventListener('click', async () => {
+      if (!isRecording) {
+        await startRecording();
+      } else {
+        await stopRecording();
+      }
+    });
+
+    let socket = null;
+    let audioContext;
+    let mediaStream;
+    let scriptProcessor;
+
+    // Connect to Socket.IO when page loads
+    window.addEventListener('DOMContentLoaded', () => {
+        if (typeof io !== 'undefined') {
+            socket = io();
+            socket.on('transcript_update', function(data) {
+                const text = data.text || data.transcript || '';
+                if (text) appendTranscriptText(text);
+            });
+            socket.on('status', function(data) {
+                console.log('Status:', data.message);
+            });
+        }
+    });
+
+    function floatTo16BitPCM(input) {
+        let output = new Int16Array(input.length);
+        for (let i = 0; i < input.length; i++) {
+            let s = Math.max(-1, Math.min(1, input[i]));
+            output[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
+        return output.buffer;
+    }
+
+    async function startRecording() {
+      if (!socket) { showToast('Socket.io not loaded! Try refreshing.', 'error'); return; }
+      recordBtn.disabled = true;
+      setStatus('Connecting…', 'idle');
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+        const source = audioContext.createMediaStreamSource(mediaStream);
+        scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
+        scriptProcessor.onaudioprocess = function(e) {
+            const inputData = e.inputBuffer.getChannelData(0);
+            socket.emit('audio_chunk', floatTo16BitPCM(inputData));
+        };
+        source.connect(scriptProcessor);
+        scriptProcessor.connect(audioContext.destination);
+        socket.emit('start_stream');
+        
+        isRecording = true;
+        recordBtn.classList.add('recording');
+        recordBtnLabel.textContent = 'Stop Recording';
+        recordBtn.setAttribute('aria-label', 'Stop recording');
+        langSelect.disabled = true;
+        setStatus('Recording', 'active');
+        startTimer();
+        setLastAction('Recording started');
+        showToast('Recording started!', 'success');
+      } catch (err) {
+        showToast(`Failed to start: ${err.message}`, 'error');
+        setStatus('Error', 'error');
+      } finally {
+        recordBtn.disabled = false;
+      }
+    }
+
+    async function stopRecording() {
+      recordBtn.disabled = true;
+      setStatus('Stopping…', 'idle');
+      try {
+        if (scriptProcessor) { scriptProcessor.disconnect(); scriptProcessor = null; }
+        if (audioContext && audioContext.state !== 'closed') audioContext.close();
+        if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+        if (socket) socket.emit('stop_stream');
+        
+        const duration = timerDisplay.textContent;
+        stopTimer();
+        
+        const el = document.getElementById('liveTranscript');
+        if (el) el.innerHTML += "\n\n[Stream ended. Generating Final MOM...]\n";
+        setStatus('Generating MOM…', 'idle');
+        momLoading.classList.add('show');
+        momError.classList.remove('show');
+        momBox.innerHTML = '';
+        
+        const momSettings = JSON.parse(localStorage.getItem('momSettings') || '{}');
+        const response = await fetch('/api/v1/generate-live-mom', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                duration: duration,
+                word_limit: momSettings.momWordLimit || 300,
+                format: momSettings.defaultFormat || 'standard',
+                include_action_items: momSettings.includeActionItems !== false
+            })
+        });
+        const data = await response.json();
+        if(data.status === 'ok') {
+            momText = data.mom || data.result || '';
+            momBox.innerHTML = renderMom(momText);
+            downloadTxtBtn.disabled = false;
+            exportDocxBtn.disabled = false;
+            setStatus('MOM Ready', 'success');
+            setLastAction('MOM generated');
+            showToast('MOM generated successfully!', 'success');
+        } else {
+            momError.classList.add('show');
+            momErrorTxt.textContent = data.error;
+            setStatus('Error', 'error');
+            setLastAction('MOM generation failed');
+            showToast(`MOM error: ${data.error}`, 'error');
+        }
+
+      } catch (err) {
+        showToast(`Stop error: ${err.message}`, 'warning');
+      } finally {
+        isRecording = false;
+        recordBtn.classList.remove('recording');
+        recordBtnLabel.textContent = 'Start Recording';
+        recordBtn.setAttribute('aria-label', 'Start recording');
+        langSelect.disabled = false;
+        momLoading.classList.remove('show');
+        recordBtn.disabled = false;
+        setLastAction('Recording stopped');
+      }
+    }
+
+    /* Render MOM text → HTML (basic markdown-like) */
+    function renderMom(text) {
+      let html = escapeHtml(text);
+      // Headings
+      html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+      html = html.replace(/^## (.+)$/gm,  '<h2>$1</h2>');
+      html = html.replace(/^# (.+)$/gm,   '<h1>$1</h1>');
+      // Bold
+      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      // Italic
+      html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      // Horizontal rule
+      html = html.replace(/^---$/gm, '<hr/>');
+      // Bullet list items
+      html = html.replace(/^[-•] (.+)$/gm, '<li>$1</li>');
+      html = html.replace(/(<li>.*<\/li>\n?)+/g, (m) => `<ul>${m}</ul>`);
+      // Numbered list
+      html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+      // Line breaks → paragraphs for remaining lines
+      html = html.replace(/\n{2,}/g, '</p><p>');
+      html = html.replace(/\n/g, '<br/>');
+      return `<p>${html}</p>`;
+    }
+
+    /* ── Download Actions ─────────────────────────────────────────────────── */
+    downloadTxtBtn.addEventListener('click', () => {
+      if (!momText.trim()) {
+        showToast('Generate MOM first before exporting.', 'warning');
+        return;
+      }
+      const blob = new Blob([momText], { type: 'text/plain;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      const ts   = new Date().toISOString().slice(0, 10);
+      a.href     = url;
+      a.download = `MOM_${ts}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded .txt file successfully.', 'success');
+    });
+
+    exportDocxBtn.addEventListener('click', async () => {
+      if (!momText.trim()) {
+        showToast('Generate MOM first before exporting.', 'warning');
+        return;
+      }
+
+      exportDocxBtn.classList.add('spinning');
+      exportDocxBtn.disabled = true;
+      setStatus('Exporting…', 'idle');
+      setLastAction('Exporting DOCX…');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/export/template`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ text: momText })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `Server error ${res.status}`);
+        }
+
+        // Trigger download
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        const ts   = new Date().toISOString().slice(0, 16).replace(/[T:]/g, '-');
+
+        // Try to get filename from Content-Disposition header
+        const cd = res.headers.get('Content-Disposition') || '';
+        const fnMatch = cd.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        a.download = fnMatch ? fnMatch[1].replace(/['"]/g, '') : `MOM_${ts}.docx`;
+        a.href = url;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        setStatus('Exported!', 'success');
+        setLastAction('DOCX downloaded');
+        showToast('Template downloaded!', 'success');
+
+      } catch (err) {
+        setStatus('Export Error', 'error');
+        setLastAction('Export failed');
+        showToast(`Export error: ${err.message}`, 'error');
+      } finally {
+        exportDocxBtn.classList.remove('spinning');
+        exportDocxBtn.disabled = !momText.trim();
+      }
+    });
+
+    /* ══════════════════════════════════════════════════════════════════
+       COPY BUTTONS
+    ══════════════════════════════════════════════════════════════════ */
+    async function copyToClipboard(text, label) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(`${label} copied to clipboard!`, 'success', 2500);
+      } catch {
+        showToast('Copy failed — please copy manually.', 'error');
+      }
+    }
+
+    copyTranscriptBtn.addEventListener('click', () => {
+      if (!transcript.trim()) { showToast('Nothing to copy yet.', 'warning'); return; }
+      copyToClipboard(transcript, 'Transcript');
+    });
+
+    copyMomBtn.addEventListener('click', () => {
+      if (!momText.trim()) { showToast('No MOM to copy yet.', 'warning'); return; }
+      copyToClipboard(momText, 'MOM');
+    });
+
+    /* ══════════════════════════════════════════════════════════════════
+       CLEAR
+    ══════════════════════════════════════════════════════════════════ */
+    clearTranscriptBtn.addEventListener('click', () => {
+      if (!confirm('Clear the transcript? This cannot be undone.')) return;
+      transcript = '';
+      transcriptBox.innerHTML = '';
+      if (transcriptPlaceholder) {
+        transcriptPlaceholder.style.display = '';
+        transcriptBox.appendChild(transcriptPlaceholder);
+      }
+      transcriptError.classList.remove('show');
+      updateWordCount();
+      genMomBtn.disabled = true;
+      showToast('Transcript cleared.', 'info', 2000);
+      setLastAction('Transcript cleared');
+    });
+
+    clearAllBtn.addEventListener('click', () => {
+      if (!confirm('Clear transcript and MOM? This cannot be undone.')) return;
+      // Clear transcript
+      transcript = '';
+      transcriptBox.innerHTML = '';
+      if (transcriptPlaceholder) {
+        transcriptPlaceholder.style.display = '';
+        transcriptBox.appendChild(transcriptPlaceholder);
+      }
+      transcriptError.classList.remove('show');
+      updateWordCount();
+      // Clear MOM
+      momText = '';
+      momBox.innerHTML = `<div class="transcript-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+        <p>Click <strong>Generate MOM</strong> after recording to get your meeting minutes</p>
+      </div>`;
+      momError.classList.remove('show');
+      genMomBtn.disabled    = true;
+      exportDocxBtn.disabled = true;
+      setLastAction('All cleared');
+      showToast('All cleared.', 'info', 2000);
+    });
+
+    /* ══════════════════════════════════════════════════════════════════
+       KEYBOARD SHORTCUT  Space = toggle recording
+    ══════════════════════════════════════════════════════════════════ */
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+      if (e.code === 'Space' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        e.preventDefault();
+        recordBtn.click();
+      }
+    });
+
+    /* ══════════════════════════════════════════════════════════════════
+       BEFORE UNLOAD GUARD
+    ══════════════════════════════════════════════════════════════════ */
+    window.addEventListener('beforeunload', (e) => {
+      if (isRecording) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+
+    /* ══════════════════════════════════════════════════════════════════
+       INIT
+    ══════════════════════════════════════════════════════════════════ */
+    genMomBtn.disabled    = true;
+    exportDocxBtn.disabled = true;
+    setStatus('Idle', 'idle');
+
+  })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+    "whisper_exe": "main.exe",
+    "whisper_model": "models/ggml-medium.bin",
+    "ollama_url": "http://127.0.0.1:11434",
+    "chunking_model": "qwen2.5:1.5b",
+    "ollama_model": "qwen2.5:7b",
+    "output_dir": ".",
+    "recordings_dir": "recordings",
+    "transcripts_dir": "transcripts",
+    "moms_dir": "moms",
+    "stt_model": "distil-small.en"
+}

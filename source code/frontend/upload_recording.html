@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Recording – MOM Generator | Secure Meters Ltd.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── CSS Custom Properties ─────────────────────────────────────────────── */
+    :root {
+      --primary:          #1F3864;
+      --primary-light:    #2a4a85;
+      --accent:           #7C3AED;
+      --accent-light:     #9b59f5;
+      --accent-glow:      rgba(124,58,237,0.25);
+      --accent-soft:      rgba(124,58,237,0.08);
+      --success:          #10b981;
+      --warning:          #f59e0b;
+      --error:            #ef4444;
+      --bg:               #f8f8fc;
+      --bg-card:          #ffffff;
+      --bg-hover:         #f1f0f9;
+      --border:           #e2e0f0;
+      --border-dashed:    #a78bfa;
+      --text-primary:     #1a1535;
+      --text-secondary:   #5b5878;
+      --text-muted:       #9694b4;
+      --shadow-sm:        0 1px 3px rgba(31,56,100,0.08);
+      --shadow-md:        0 4px 16px rgba(31,56,100,0.12);
+      --shadow-lg:        0 8px 32px rgba(31,56,100,0.16);
+      --shadow-accent:    0 4px 24px rgba(124,58,237,0.20);
+      --radius-sm:        8px;
+      --radius-md:        14px;
+      --radius-lg:        20px;
+      --radius-xl:        28px;
+      --transition:       0.22s cubic-bezier(0.4,0,0.2,1);
+      --topbar-h:         68px;
+    }
+
+    [data-theme="dark"] {
+      --bg:               #0f0d1e;
+      --bg-card:          #1a1730;
+      --bg-hover:         #221f3a;
+      --border:           #2d2850;
+      --border-dashed:    #6d28d9;
+      --text-primary:     #ede9ff;
+      --text-secondary:   #a09cc4;
+      --text-muted:       #5e5a80;
+      --shadow-sm:        0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md:        0 4px 16px rgba(0,0,0,0.4);
+      --shadow-lg:        0 8px 32px rgba(0,0,0,0.5);
+      --accent-glow:      rgba(124,58,237,0.35);
+      --accent-soft:      rgba(124,58,237,0.12);
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+      overflow-x: hidden;
+    }
+
+    /* ─── Background Decoration ─────────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(124,58,237,0.10) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: floatOrb 14s ease-in-out infinite alternate;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -200px; left: -150px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(31,56,100,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes floatOrb {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(-40px, 40px) scale(1.1); }
+    }
+
+    /* ─── Top Bar ────────────────────────────────────────────────────────────── */
+    .topbar {
+      position: sticky;
+      top: 0; left: 0; right: 0;
+      height: var(--topbar-h);
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+      transition: background var(--transition), border-color var(--transition);
+    }
+    [data-theme="dark"] .topbar {
+      background: rgba(15,13,30,0.80);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.84rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--transition);
+    }
+    .back-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: var(--shadow-sm);
+      transform: translateX(-2px);
+    }
+    .back-btn svg { flex-shrink: 0; }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: -0.5px;
+      box-shadow: 0 2px 8px rgba(124,58,237,0.30);
+    }
+    .brand-text {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+    .brand-sub {
+      font-size: 0.70rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      display: block;
+      margin-top: -2px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      width: 46px; height: 26px;
+      background: var(--border);
+      border-radius: 13px;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: background var(--transition);
+      outline: none;
+    }
+    .theme-toggle:focus-visible { box-shadow: 0 0 0 3px var(--accent-glow); }
+    [data-theme="dark"] .theme-toggle { background: var(--accent); }
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      left: 3px; top: 3px;
+      width: 20px; height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform var(--transition);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    [data-theme="dark"] .theme-toggle::after { transform: translateX(20px); }
+
+    .theme-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      user-select: none;
+    }
+
+    /* ─── Main Content ───────────────────────────────────────────────────────── */
+    .main-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── Page Header ─────────────────────────────────────────────────────────── */
+    .page-header {
+      margin-bottom: 40px;
+      animation: fadeSlideDown 0.5s ease both;
+    }
+    .page-header-inner {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 12px;
+    }
+    .page-icon {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+      flex-shrink: 0;
+    }
+    .page-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+    .page-title span { color: var(--accent); }
+    .page-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      font-weight: 400;
+      line-height: 1.6;
+      max-width: 560px;
+    }
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Progress Steps ──────────────────────────────────────────────────────── */
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 28px;
+      box-shadow: var(--shadow-sm);
+      overflow-x: auto;
+      animation: fadeSlideDown 0.5s ease 0.1s both;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .step-bubble {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .step.active .step-bubble {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+    .step.done .step-bubble {
+      background: var(--success);
+      color: #fff;
+    }
+    .step-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: color var(--transition);
+      white-space: nowrap;
+    }
+    .step.active .step-label { color: var(--accent); }
+    .step.done  .step-label { color: var(--success); }
+
+    .step-connector {
+      flex: 1;
+      min-width: 24px;
+      height: 2px;
+      background: var(--border);
+      margin: 0 10px;
+      border-radius: 2px;
+      transition: background var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .step-connector.filled::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--success);
+      border-radius: 2px;
+      animation: fillBar 0.4s ease forwards;
+    }
+    @keyframes fillBar {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
+    /* ─── Card ───────────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 24px;
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+      animation: fadeSlideUp 0.5s ease both;
+    }
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card:nth-child(1) { animation-delay: 0.10s; }
+    .card:nth-child(2) { animation-delay: 0.18s; }
+    .card:nth-child(3) { animation-delay: 0.24s; }
+    .card:nth-child(4) { animation-delay: 0.30s; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .card-icon {
+      width: 40px; height: 40px;
+      background: var(--accent-soft);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+    }
+    .card-title-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* ─── Drop Zone ──────────────────────────────────────────────────────────── */
+    .drop-zone {
+      border: 2.5px dashed var(--border-dashed);
+      border-radius: var(--radius-md);
+      padding: 52px 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      background: var(--accent-soft);
+      position: relative;
+      overflow: hidden;
+    }
+    .drop-zone::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .drop-zone:hover::before,
+    .drop-zone.dragover::before { opacity: 1; }
+    .drop-zone:hover,
+    .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(124,58,237,0.06);
+      box-shadow: 0 0 0 4px var(--accent-glow), var(--shadow-accent);
+      transform: scale(1.005);
+    }
+    .drop-zone.dragover {
+      border-style: solid;
+    }
+
+    .drop-icon {
+      width: 68px; height: 68px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.30);
+      animation: floatIcon 3s ease-in-out infinite;
+    }
+    @keyframes floatIcon {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-6px); }
+    }
+
+    .drop-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .drop-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .browse-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+    .browse-btn:hover {
+      background: var(--accent-light);
+      box-shadow: 0 4px 20px rgba(124,58,237,0.40);
+      transform: translateY(-1px);
+    }
+    .drop-formats {
+      margin-top: 16px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .drop-formats span {
+      display: inline-block;
+      margin: 3px 3px;
+      padding: 3px 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    #file-input { display: none; }
+
+    /* ─── File Preview ────────────────────────────────────────────────────────── */
+    .file-preview {
+      display: none;
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      gap: 16px;
+      align-items: center;
+      animation: fadeSlideUp 0.3s ease;
+    }
+    .file-preview.visible { display: flex; }
+
+    .file-thumb {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .file-info { flex: 1; min-width: 0; }
+    .file-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .file-meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .file-meta span { margin-right: 14px; }
+    .file-remove {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      width: 32px; height: 32px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .file-remove:hover { border-color: var(--error); color: var(--error); background: rgba(239,68,68,0.06); }
+
+    /* ─── Format Selector ────────────────────────────────────────────────────── */
+    .format-selector {
+      margin-top: 24px;
+    }
+    .format-label {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .format-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .format-chip {
+      padding: 8px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      background: var(--bg-card);
+      transition: all var(--transition);
+      user-select: none;
+    }
+    .format-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .format-chip.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 10px var(--accent-glow);
+    }
+
+    /* ─── Primary Action Button ──────────────────────────────────────────────── */
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px 28px;
+      background: linear-gradient(135deg, var(--accent) 0%, #6d28d9 100%);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition);
+      box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+      margin-top: 24px;
+      letter-spacing: 0.2px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, transparent 60%);
+    }
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 6px 28px rgba(124,58,237,0.50);
+      transform: translateY(-2px);
+    }
+    .btn-primary:active:not(:disabled) { transform: translateY(0); }
+    .btn-primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1.5px solid var(--accent);
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+    .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-success {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      background: var(--success);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      box-shadow: 0 2px 10px rgba(16,185,129,0.25);
+    }
+    .btn-success:hover:not(:disabled) {
+      background: #059669;
+      box-shadow: 0 4px 16px rgba(16,185,129,0.35);
+      transform: translateY(-1px);
+    }
+    .btn-success:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ─── Progress Bar ────────────────────────────────────────────────────────── */
+    .progress-wrap {
+      display: none;
+      margin-top: 20px;
+      animation: fadeSlideUp 0.3s ease;
+    }
+    .progress-wrap.visible { display: block; }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .progress-status {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .progress-pct {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .progress-track {
+      height: 8px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent) 0%, #a855f7 100%);
+      border-radius: 100px;
+      width: 0%;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+    }
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 40px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+      animation: shimmer 1s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      from { opacity: 0; }
+      50%  { opacity: 1; }
+      to   { opacity: 0; }
+    }
+
+    /* ─── Alert / Message ─────────────────────────────────────────────────────── */
+    .alert {
+      display: none;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-top: 16px;
+      align-items: center;
+      gap: 10px;
+      animation: fadeSlideUp 0.3s ease;
+    }
+    .alert.visible { display: flex; }
+    .alert.error   { background: rgba(239,68,68,0.10);  border: 1px solid rgba(239,68,68,0.3);  color: var(--error); }
+    .alert.success { background: rgba(16,185,129,0.10); border: 1px solid rgba(16,185,129,0.3); color: var(--success); }
+    .alert.info    { background: var(--accent-soft);    border: 1px solid rgba(124,58,237,0.2); color: var(--accent); }
+
+    /* ─── Result Panel ────────────────────────────────────────────────────────── */
+    .result-panel {
+      display: none;
+    }
+    .result-panel.visible { display: block; }
+
+    .result-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .result-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .result-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .result-textarea {
+      width: 100%;
+      min-height: 180px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      line-height: 1.7;
+      resize: vertical;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .result-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    /* ─── MOM Display ─────────────────────────────────────────────────────────── */
+    .mom-display {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      font-size: 0.875rem;
+      line-height: 1.8;
+      color: var(--text-primary);
+      min-height: 200px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    .mom-display::-webkit-scrollbar { width: 6px; }
+    .mom-display::-webkit-scrollbar-track { background: transparent; }
+    .mom-display::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .mom-display::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    .mom-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      color: var(--text-muted);
+      gap: 12px;
+      text-align: center;
+    }
+    .mom-placeholder svg { opacity: 0.35; }
+    .mom-placeholder p { font-size: 0.875rem; }
+
+    /* ─── Divider ────────────────────────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 4px 0 24px;
+    }
+
+    /* ─── Spinner ────────────────────────────────────────────────────────────── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Responsive ─────────────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .topbar { padding: 0 16px; }
+      .main-content { padding: 28px 14px 60px; }
+      .card { padding: 22px 18px; }
+      .page-title { font-size: 1.55rem; }
+      .progress-steps { padding: 16px 18px; }
+      .drop-zone { padding: 36px 20px; }
+      .brand-text { display: none; }
+    }
+
+    /* ─── Scrollbar global ───────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ─── Badge ──────────────────────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .badge-accent {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(124,58,237,0.25);
+    }
+    .badge-success {
+      background: rgba(16,185,129,0.10);
+      color: var(--success);
+      border: 1px solid rgba(16,185,129,0.25);
+    }
+
+    /* ─── Copy animation ─────────────────────────────────────────────────────── */
+    @keyframes copyPop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+    .copy-pop { animation: copyPop 0.25s ease; }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── Top Bar ────────────────────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="/" class="back-btn" id="back-btn" title="Back to Home">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
+        </svg>
+        Back to Home
+      </a>
+      <div class="topbar-brand">
+        <div class="brand-logo">M</div>
+        <div>
+          <div class="brand-text">MOM Generator</div>
+          <span class="brand-sub">Secure Meters Ltd.</span>
+        </div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="theme-label" id="theme-label">Light</span>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme"></button>
+    </div>
+  </header>
+
+  <!-- ── Main Content ────────────────────────────────────────────────────────── -->
+  <main class="main-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="page-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="page-title">Upload <span>Recording</span></h1>
+        </div>
+      </div>
+      <p class="page-subtitle">Upload your audio or video meeting recording to automatically transcribe it and generate a professional Minutes of Meeting document.</p>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="progress-steps" id="progress-steps">
+      <div class="step active" id="step-1">
+        <div class="step-bubble">1</div>
+        <div class="step-label">Upload</div>
+      </div>
+      <div class="step-connector" id="conn-1"></div>
+      <div class="step" id="step-2">
+        <div class="step-bubble">2</div>
+        <div class="step-label">Transcribe</div>
+      </div>
+      <div class="step-connector" id="conn-2"></div>
+      <div class="step" id="step-3">
+        <div class="step-bubble">3</div>
+        <div class="step-label">Generate MOM</div>
+      </div>
+      <div class="step-connector" id="conn-3"></div>
+      <div class="step" id="step-4">
+        <div class="step-bubble">4</div>
+        <div class="step-label">Export</div>
+      </div>
+    </div>
+
+    <!-- ── Card 1: Upload ─────────────────────────────────────────────────── -->
+    <div class="card" style="animation-delay:0.10s">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title">Audio / Video File</div>
+          <div class="card-title-sub">Drag & drop or click to browse</div>
+        </div>
+      </div>
+
+      <!-- Drop Zone -->
+      <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-label="Drop audio or video file here">
+        <div class="drop-icon">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+          </svg>
+        </div>
+        <div class="drop-title">Drop your recording here</div>
+        <div class="drop-subtitle">Supports audio and video meeting recordings<br>up to 500 MB</div>
+        <button class="browse-btn" type="button" id="browse-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Browse Files
+        </button>
+        <div class="drop-formats">
+          <span>MP3</span><span>WAV</span><span>MP4</span><span>M4A</span><span>OGG</span><span>AAC</span><span>FLAC</span><span>WEBM</span>
+        </div>
+        <input type="file" id="file-input" accept=".mp3,.wav,.mp4,.m4a,.ogg,.aac,.flac,.webm" />
+      </div>
+
+      <!-- File Preview -->
+      <div class="file-preview" id="file-preview">
+        <div class="file-thumb">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+          </svg>
+        </div>
+        <div class="file-info">
+          <div class="file-name" id="file-name">filename.mp3</div>
+          <div class="file-meta">
+            <span id="file-size">—</span>
+            <span id="file-type">—</span>
+            <span id="file-duration">—</span>
+          </div>
+        </div>
+        <button class="file-remove" id="file-remove" title="Remove file" aria-label="Remove file">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Format Selector -->
+      <div class="format-selector">
+        <span class="format-label">MOM Format</span>
+        <div class="format-options" id="format-options" role="group" aria-label="MOM format">
+          <div class="format-chip active" data-format="standard" tabindex="0" role="button">📋 Standard</div>
+          <div class="format-chip" data-format="executive" tabindex="0" role="button">💼 Executive</div>
+          <div class="format-chip" data-format="technical" tabindex="0" role="button">⚙️ Technical</div>
+          <div class="format-chip" data-format="brief" tabindex="0" role="button">⚡ Brief</div>
+        </div>
+      </div>
+
+      <!-- Upload Alert -->
+      <div class="alert" id="upload-alert"></div>
+
+      <!-- Primary Action -->
+      <button class="btn-primary" id="transcribe-btn" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </svg>
+        Transcribe &amp; Generate MOM
+      </button>
+
+      <!-- Upload Progress -->
+      <div class="progress-wrap" id="upload-progress">
+        <div class="progress-header">
+          <span class="progress-status" id="upload-status">Uploading file…</span>
+          <span class="progress-pct" id="upload-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="upload-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Card 2: Transcript ─────────────────────────────────────────────── -->
+    <div class="card result-panel" id="transcript-panel" style="animation-delay:0.18s">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div style="flex:1">
+          <div class="card-title">Transcription Result</div>
+          <div class="card-title-sub">Raw speech-to-text output</div>
+        </div>
+        <span class="badge badge-success" id="transcript-badge" style="display:none">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Done
+        </span>
+      </div>
+      <div class="divider"></div>
+
+      <div class="result-toolbar">
+        <span class="result-title">Transcript</span>
+        <div class="result-actions">
+          <button class="btn-secondary" id="copy-transcript-btn" title="Copy transcript">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <textarea class="result-textarea" id="transcript-text" placeholder="Transcription will appear here…" rows="8"></textarea>
+
+      <div class="alert" id="transcript-alert"></div>
+
+      <button class="btn-primary" id="generate-mom-btn" style="margin-top:20px" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+        </svg>
+        Generate MOM from Transcript
+      </button>
+
+      <div class="progress-wrap" id="mom-progress">
+        <div class="progress-header">
+          <span class="progress-status" id="mom-status">Generating MOM…</span>
+          <span class="progress-pct" id="mom-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="mom-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Card 3: MOM Output ─────────────────────────────────────────────── -->
+    <div class="card result-panel" id="mom-panel" style="animation-delay:0.24s">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <div style="flex:1">
+          <div class="card-title">Minutes of Meeting</div>
+          <div class="card-title-sub">AI-generated structured document</div>
+        </div>
+        <span class="badge badge-accent" id="mom-format-badge">Standard</span>
+      </div>
+      <div class="divider"></div>
+
+      <div class="result-toolbar">
+        <span class="result-title">Generated MOM</span>
+        <div class="result-actions">
+          <button class="btn-secondary" id="copy-mom-btn" title="Copy MOM">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy
+          </button>
+          <button class="btn-secondary" id="download-txt-btn" title="Download TXT">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            TXT
+          </button>
+          <button class="btn-success" id="download-docx-btn" title="Download DOCX Template">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download DOCX Template
+          </button>
+        </div>
+      </div>
+
+      <div class="mom-display" id="mom-display">
+        <div class="mom-placeholder">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <p>Your generated MOM will appear here</p>
+        </div>
+      </div>
+
+      <div class="alert" id="mom-alert"></div>
+
+      <div class="progress-wrap" id="export-progress">
+        <div class="progress-header">
+          <span class="progress-status" id="export-status">Preparing DOCX…</span>
+          <span class="progress-pct" id="export-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="export-fill"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── JavaScript ─────────────────────────────────────────────────────────── -->
+  <script src="/socket.io.min.js"></script>
+  <script>
+  (() => {
+    'use strict';
+
+    const API = 'http://127.0.0.1:5001';
+    let socket = null;
+    if (typeof io !== 'undefined') {
+        socket = io();
+        socket.on('progress_update', (data) => {
+            const pct = data.progress;
+            const status = data.status;
+            const uploadProgress = document.getElementById('upload-progress');
+            const uploadFill = document.getElementById('upload-fill');
+            const uploadStatus = document.getElementById('upload-status');
+            const uploadPct = document.getElementById('upload-pct');
+            if (uploadProgress && uploadProgress.classList.contains('visible')) {
+                uploadFill.style.width = pct + '%';
+                uploadStatus.textContent = status;
+                uploadPct.textContent = Math.round(pct) + '%';
+            }
+        });
+    }
+
+    /* ── Theme ────────────────────────────────────────────────────────────── */
+    const htmlEl     = document.documentElement;
+    const toggleBtn  = document.getElementById('theme-toggle');
+    const themeLabel = document.getElementById('theme-label');
+
+    function applyTheme(theme) {
+      htmlEl.setAttribute('data-theme', theme);
+      themeLabel.textContent = theme === 'dark' ? 'Dark' : 'Light';
+      localStorage.setItem('mom-theme', theme);
+    }
+
+    // Load from localStorage
+    const savedTheme = localStorage.getItem('mom-theme') || 'light';
+    applyTheme(savedTheme);
+    
+    // Apply default format from settings
+    const momSettings = JSON.parse(localStorage.getItem('momSettings') || '{}');
+    if (momSettings.defaultFormat) {
+        const formatSelect = document.getElementById('mom-format');
+        if (formatSelect) {
+            formatSelect.value = momSettings.defaultFormat;
+        }
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      const cur = htmlEl.getAttribute('data-theme');
+      applyTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+
+    /* ── State ────────────────────────────────────────────────────────────── */
+    let selectedFile     = null;
+    let transcriptText   = '';
+    let momText          = '';
+    let selectedFormat   = 'standard';
+
+    /* ── DOM refs ─────────────────────────────────────────────────────────── */
+    const dropZone         = document.getElementById('drop-zone');
+    const fileInput        = document.getElementById('file-input');
+    const browseBtn        = document.getElementById('browse-btn');
+    const filePreview      = document.getElementById('file-preview');
+    const fileNameEl       = document.getElementById('file-name');
+    const fileSizeEl       = document.getElementById('file-size');
+    const fileTypeEl       = document.getElementById('file-type');
+    const fileDurEl        = document.getElementById('file-duration');
+    const fileRemoveBtn    = document.getElementById('file-remove');
+    const transcribeBtn    = document.getElementById('transcribe-btn');
+    const uploadProgress   = document.getElementById('upload-progress');
+    const uploadFill       = document.getElementById('upload-fill');
+    const uploadStatus     = document.getElementById('upload-status');
+    const uploadPct        = document.getElementById('upload-pct');
+    const uploadAlert      = document.getElementById('upload-alert');
+    const transcriptPanel  = document.getElementById('transcript-panel');
+    const transcriptText_  = document.getElementById('transcript-text');
+    const transcriptBadge  = document.getElementById('transcript-badge');
+    const copyTranscriptBtn= document.getElementById('copy-transcript-btn');
+    const transcriptAlert  = document.getElementById('transcript-alert');
+    const generateMomBtn   = document.getElementById('generate-mom-btn');
+    const momProgress      = document.getElementById('mom-progress');
+    const momFill          = document.getElementById('mom-fill');
+    const momStatus        = document.getElementById('mom-status');
+    const momPct           = document.getElementById('mom-pct');
+    const momPanel         = document.getElementById('mom-panel');
+    const momDisplay       = document.getElementById('mom-display');
+    const momAlert         = document.getElementById('mom-alert');
+    const copyMomBtn       = document.getElementById('copy-mom-btn');
+    const downloadTxtBtn   = document.getElementById('download-txt-btn');
+    const downloadDocxBtn  = document.getElementById('download-docx-btn');
+    const exportProgress   = document.getElementById('export-progress');
+    const exportFill       = document.getElementById('export-fill');
+    const exportStatus     = document.getElementById('export-status');
+    const exportPct        = document.getElementById('export-pct');
+    const formatBadge      = document.getElementById('mom-format-badge');
+
+    /* ── Progress Steps ───────────────────────────────────────────────────── */
+    function setStep(n) {
+      for (let i = 1; i <= 4; i++) {
+        const stepEl = document.getElementById('step-' + i);
+        const connEl = document.getElementById('conn-' + (i-1));
+        stepEl.classList.remove('active', 'done');
+        if (i < n)       { stepEl.classList.add('done'); stepEl.querySelector('.step-bubble').innerHTML = '✓'; }
+        else if (i === n){ stepEl.classList.add('active'); stepEl.querySelector('.step-bubble').textContent = i; }
+        else             { stepEl.querySelector('.step-bubble').textContent = i; }
+        if (connEl) {
+          if (i <= n) connEl.classList.add('filled');
+          else        connEl.classList.remove('filled');
+        }
+      }
+    }
+    setStep(1);
+
+    /* ── Format Selector ──────────────────────────────────────────────────── */
+    document.querySelectorAll('.format-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.format-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        selectedFormat = chip.dataset.format;
+        formatBadge.textContent = chip.textContent.replace(/^.\s/, '');
+      });
+      chip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') chip.click(); });
+    });
+
+    /* ── Helpers ──────────────────────────────────────────────────────────── */
+    function formatBytes(b) {
+      if (b < 1024) return b + ' B';
+      if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+      return (b/1024/1024).toFixed(2) + ' MB';
+    }
+
+    function showAlert(el, type, msg) {
+      el.className = 'alert visible ' + type;
+      el.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        ${type === 'error'   ? '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>' :
+          type === 'success' ? '<polyline points="20 6 9 17 4 12"/>' :
+                               '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'}
+      </svg><span>${msg}</span>`;
+    }
+    function hideAlert(el) { el.className = 'alert'; el.innerHTML = ''; }
+
+    function setProgress(fillEl, statusEl, pctEl, pct, msg) {
+      fillEl.style.width = pct + '%';
+      statusEl.textContent = msg;
+      pctEl.textContent = Math.round(pct) + '%';
+    }
+
+    function animateProgress(fillEl, statusEl, pctEl, from, to, msg, durationMs) {
+      return new Promise(resolve => {
+        const start = performance.now();
+        function tick(now) {
+          const t = Math.min((now - start) / durationMs, 1);
+          const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+          setProgress(fillEl, statusEl, pctEl, from + (to - from) * ease, msg);
+          if (t < 1) requestAnimationFrame(tick);
+          else resolve();
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    /* ── File Selection ───────────────────────────────────────────────────── */
+    function handleFile(file) {
+      if (!file) return;
+      const allowed = /\.(mp3|wav|mp4|m4a|ogg|aac|flac|webm)$/i;
+      if (!allowed.test(file.name)) {
+        showAlert(uploadAlert, 'error', 'Unsupported file type. Please upload MP3, WAV, MP4, M4A, OGG, AAC, FLAC, or WEBM.');
+        return;
+      }
+      if (file.size > 500 * 1024 * 1024) {
+        showAlert(uploadAlert, 'error', 'File is too large. Maximum size is 500 MB.');
+        return;
+      }
+      hideAlert(uploadAlert);
+      selectedFile = file;
+
+      fileNameEl.textContent = file.name;
+      fileSizeEl.textContent = formatBytes(file.size);
+      fileTypeEl.textContent = file.type || file.name.split('.').pop().toUpperCase();
+      fileDurEl.textContent  = 'Calculating…';
+
+      filePreview.classList.add('visible');
+      transcribeBtn.disabled = false;
+
+      // Try to get duration
+      try {
+        const url = URL.createObjectURL(file);
+        const media = document.createElement(file.type.startsWith('video') ? 'video' : 'audio');
+        media.preload = 'metadata';
+        media.onloadedmetadata = () => {
+          const d = media.duration;
+          if (isFinite(d)) {
+            const m = Math.floor(d / 60), s = Math.floor(d % 60);
+            fileDurEl.textContent = m + ':' + String(s).padStart(2,'0') + ' min';
+          } else {
+            fileDurEl.textContent = 'Unknown duration';
+          }
+          URL.revokeObjectURL(url);
+        };
+        media.onerror = () => {
+          fileDurEl.textContent = 'Duration N/A';
+          URL.revokeObjectURL(url);
+        };
+        media.src = url;
+      } catch (e) {
+        fileDurEl.textContent = '—';
+      }
+    }
+
+    browseBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) handleFile(fileInput.files[0]);
+    });
+
+    dropZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const f = e.dataTransfer.files[0];
+      if (f) handleFile(f);
+    });
+
+    fileRemoveBtn.addEventListener('click', () => {
+      selectedFile = null;
+      fileInput.value = '';
+      filePreview.classList.remove('visible');
+      transcribeBtn.disabled = true;
+      hideAlert(uploadAlert);
+      setStep(1);
+    });
+
+    /* ── Transcribe & Generate ────────────────────────────────────────────── */
+    transcribeBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      // UI: lock
+      transcribeBtn.disabled = true;
+      transcribeBtn.innerHTML = '<div class="spinner"></div> Processing…';
+      hideAlert(uploadAlert);
+      uploadProgress.classList.add('visible');
+      setStep(2);
+
+      try {
+        const formData = new FormData();
+        formData.append('audio', selectedFile);
+        formData.append('format', selectedFormat);
+
+        setProgress(uploadFill, uploadStatus, uploadPct, 0, 'Uploading file…');
+
+        const controller = new AbortController();
+        const resp = await fetch(`${API}/api/v1/generate`, {
+          method: 'POST',
+          body: formData,
+          signal: controller.signal
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ message: `Server error ${resp.status}` }));
+          throw new Error(err.message || err.error || `Server returned ${resp.status}`);
+        }
+
+        const data = await resp.json();
+
+        setProgress(uploadFill, uploadStatus, uploadPct, 100, 'Complete!');
+
+        transcriptText = data.transcript || data.text || data.transcription || '';
+        momText = data.mom || data.result || '';
+
+        if (!transcriptText) throw new Error('No transcript received from server.');
+
+        // Show transcript panel
+        transcriptText_.value = transcriptText;
+        transcriptPanel.classList.add('visible');
+        transcriptBadge.style.display = 'inline-flex';
+        generateMomBtn.disabled = false;
+
+        // Show MOM panel instantly since /api/v1/generate does both!
+        if (momText) {
+            momDisplay.textContent = momText;
+            momPanel.classList.add('visible');
+            momPanel.classList.add('visible');
+            setStep(4);
+            downloadTxtBtn.disabled = false;
+            downloadDocxBtn.disabled = false;
+        } else {
+            setStep(3);
+        }
+
+        showAlert(uploadAlert, 'success', 'Processing complete!');
+        momPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (err) {
+        console.error(err);
+        showAlert(uploadAlert, 'error', 'Processing failed: ' + (err.message || 'Unknown error. Is the server running?'));
+        setProgress(uploadFill, uploadStatus, uploadPct, 0, 'Failed');
+        setStep(1);
+      } finally {
+        transcribeBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Transcribe &amp; Generate MOM`;
+        transcribeBtn.disabled = !selectedFile;
+      }
+    });
+
+    /* ── Generate MOM ─────────────────────────────────────────────────────── */
+    generateMomBtn.addEventListener('click', async () => {
+      const txt = transcriptText_.value.trim();
+      if (!txt) {
+        showAlert(transcriptAlert, 'error', 'Transcript is empty. Please transcribe a file first.');
+        return;
+      }
+
+      generateMomBtn.disabled = true;
+      generateMomBtn.innerHTML = '<div class="spinner"></div> Generating…';
+      hideAlert(transcriptAlert);
+      momProgress.classList.add('visible');
+      setStep(3);
+
+      // Show mom panel early
+      momPanel.classList.add('visible');
+      momDisplay.innerHTML = `<div class="mom-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>Generating your MOM…</p></div>`;
+
+      try {
+        await animateProgress(momFill, momStatus, momPct, 0, 30, 'Analyzing transcript…', 600);
+
+        const momSettings = JSON.parse(localStorage.getItem('momSettings') || '{}');
+        const resp = await fetch(`${API}/api/v1/generate-from-text`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+              transcript: txt, 
+              format: selectedFormat,
+              word_limit: momSettings.momWordLimit || 300,
+              include_action_items: momSettings.includeActionItems !== false
+          })
+        });
+
+        const progInterval = setInterval(() => {
+          const cur = parseFloat(momFill.style.width) || 30;
+          if (cur < 88) setProgress(momFill, momStatus, momPct, Math.min(cur + 3, 88), 'Structuring MOM…');
+        }, 400);
+
+        if (!resp.ok) {
+          clearInterval(progInterval);
+          const err = await resp.json().catch(() => ({ message: `Server error ${resp.status}` }));
+          throw new Error(err.message || err.error || `Server returned ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        clearInterval(progInterval);
+
+        momText = data.mom || data.text || data.result || data.output || '';
+        if (!momText) throw new Error('No MOM content received from server.');
+
+        await animateProgress(momFill, momStatus, momPct, 88, 100, 'MOM generated!', 400);
+
+        momDisplay.textContent = momText;
+        showAlert(transcriptAlert, 'success', 'MOM generated successfully! Download DOCX or copy the content.');
+        setStep(4);
+        downloadTxtBtn.disabled = false;
+        downloadDocxBtn.disabled = false;
+        momPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (err) {
+        console.error(err);
+        showAlert(transcriptAlert, 'error', 'MOM generation failed: ' + (err.message || 'Unknown error.'));
+        momDisplay.innerHTML = `<div class="mom-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Generation failed. Please try again.</p></div>`;
+        setStep(3);
+      } finally {
+        generateMomBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Generate MOM from Transcript`;
+        generateMomBtn.disabled = false;
+      }
+    });
+
+    /* ── Download Actions ─────────────────────────────────────────────────── */
+    downloadTxtBtn.addEventListener('click', () => {
+      const text = momDisplay.textContent;
+      if (!text) {
+        showAlert(momAlert, 'warning', 'No MOM content to download.');
+        return;
+      }
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      const ts   = new Date().toISOString().slice(0, 10);
+      a.href     = url;
+      a.download = `MOM_${ts}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showAlert(momAlert, 'success', 'Downloaded .txt file successfully.');
+    });
+
+    downloadDocxBtn.addEventListener('click', async () => {
+      const txt = momText || momDisplay.textContent.trim();
+      if (!txt || momDisplay.querySelector('.mom-placeholder')) {
+        showAlert(momAlert, 'error', 'No MOM content to export. Generate a MOM first.');
+        return;
+      }
+
+      downloadDocxBtn.disabled = true;
+      downloadDocxBtn.innerHTML = '<div class="spinner" style="border-color:rgba(255,255,255,0.35);border-top-color:#fff;"></div> Preparing…';
+      hideAlert(momAlert);
+      exportProgress.classList.add('visible');
+
+      try {
+        await animateProgress(exportFill, exportStatus, exportPct, 0, 50, 'Building DOCX template…', 600);
+
+        const resp = await fetch(`${API}/api/v1/export/template`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: txt, format: selectedFormat })
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ message: `Server error ${resp.status}` }));
+          throw new Error(err.message || err.error || `Server returned ${resp.status}`);
+        }
+
+        await animateProgress(exportFill, exportStatus, exportPct, 50, 95, 'Finalizing…', 400);
+
+        const blob = await resp.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url;
+
+        // Determine filename from content-disposition header or fallback
+        const cd = resp.headers.get('content-disposition') || '';
+        const fnMatch = cd.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        a.download = fnMatch ? fnMatch[1].replace(/['"]/g,'') : 'MOM_' + new Date().toISOString().slice(0,10) + '.docx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+        await animateProgress(exportFill, exportStatus, exportPct, 95, 100, 'Download started!', 300);
+        showAlert(momAlert, 'success', 'DOCX downloaded successfully!');
+        setStep(4);
+
+      } catch (err) {
+        console.error(err);
+        showAlert(momAlert, 'error', 'Export failed: ' + (err.message || 'Unknown error.'));
+        setProgress(exportFill, exportStatus, exportPct, 0, 'Failed');
+      } finally {
+        downloadDocxBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download DOCX`;
+        downloadDocxBtn.disabled = false;
+      }
+    });
+
+    /* ── Copy Buttons ─────────────────────────────────────────────────────── */
+    async function copyToClipboard(text, btn, originalHTML) {
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+        btn.classList.add('copy-pop');
+        setTimeout(() => { btn.innerHTML = originalHTML; btn.classList.remove('copy-pop'); }, 2000);
+      } catch {
+        btn.innerHTML = '✗ Failed';
+        setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
+      }
+    }
+
+    const copyTransHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+    const copyMomHTML   = copyTransHTML;
+
+    copyTranscriptBtn.addEventListener('click', () => {
+      copyToClipboard(transcriptText_.value, copyTranscriptBtn, copyTransHTML);
+    });
+
+    copyMomBtn.addEventListener('click', () => {
+      const content = momDisplay.textContent || '';
+      copyToClipboard(content, copyMomBtn, copyMomHTML);
+    });
+
+    /* ── Keyboard: transcript live update ────────────────────────────────── */
+    transcriptText_.addEventListener('input', () => {
+      transcriptText = transcriptText_.value;
+      generateMomBtn.disabled = !transcriptText_.value.trim();
+    });
+
+  })();
+  </script>
+
+</body>
+</html>

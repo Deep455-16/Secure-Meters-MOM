@@ -1570,11 +1570,28 @@
       try {
         await animateProgress(exportFill, exportStatus, exportPct, 0, 50, 'Building DOCX template…', 600);
 
+        // Collect meeting metadata for the DOCX header
+        const now = new Date();
+        const meetingDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+        const meetingTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
+        // Get file duration from the displayed element if available
+        const fileDurEl = document.getElementById('file-duration');
+        const meetingDuration = (fileDurEl && fileDurEl.textContent && fileDurEl.textContent !== '-')
+          ? fileDurEl.textContent
+          : '';
+
         const resp = await fetch(`${API}/api/v1/export/template`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: txt, format: selectedFormat })
+          body: JSON.stringify({
+            text:         txt,
+            format:       selectedFormat,
+            meeting_date: meetingDate,
+            meeting_time: meetingTime,
+            duration:     meetingDuration
+          })
         });
+
 
         if (!resp.ok) {
           const err = await resp.json().catch(() => ({ message: `Server error ${resp.status}` }));

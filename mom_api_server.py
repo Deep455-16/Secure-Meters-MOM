@@ -183,6 +183,12 @@ def export_template():
         if not text:
             return jsonify({'error': 'No MOM text provided'}), 400
 
+        # ── Explicit metadata passed directly from frontend ────────────────
+        explicit_date     = (data.get('meeting_date') or '').strip()
+        explicit_time     = (data.get('meeting_time') or '').strip()
+        explicit_duration = (data.get('duration') or '').strip()
+        logger.info(f"[template] explicit_date={explicit_date!r} explicit_time={explicit_time!r} explicit_duration={explicit_duration!r}")
+
         # ── Regex helpers ──────────────────────────────────────────────────
         def extract_section(pattern, src_, default=''):
             m = re.search(pattern, src_, re.IGNORECASE | re.DOTALL)
@@ -206,16 +212,30 @@ def export_template():
               r'KEY DISCUSSION|DECISIONS?(?: MADE| TAKEN)?|ACTION ITEMS?|'
               r'NEXT STEPS?|MINUTES OF MEETING)\b|\Z)')
 
-        # Metadata (anchored to line-start)
-        meeting_date = extract_section(r'(?:^|\n)\*{0,2}(?:DATE|MEETING DATE)\*{0,2}\s*[:\-]\s*([^\n*]+)', text)
-        meeting_time = extract_section(r'(?:^|\n)\*{0,2}TIME\*{0,2}\s*[:\-]\s*([^\n*]+)', text)
+        # Metadata — use explicit values first, fall back to regex, then server datetime
+        _now = datetime.now()
+        meeting_date = (
+            explicit_date
+            or extract_section(r'(?:^|\n)\*{0,2}(?:DATE|MEETING DATE)\*{0,2}\s*[:\-]\s*([^\n*]+)', text)
+            or _now.strftime('%d %B %Y')
+        )
+        meeting_time = (
+            explicit_time
+            or extract_section(r'(?:^|\n)\*{0,2}TIME\*{0,2}\s*[:\-]\s*([^\n*]+)', text)
+            or _now.strftime('%I:%M %p')
+        )
         purpose      = extract_section(r'(?:^|\n)\*{0,2}(?:PURPOSE|SUBJECT|MEETING PURPOSE)\*{0,2}\s*[:\-]\s*([^\n*]+)', text)
         participants = extract_section(r'\*{0,2}(?:ATTENDEES?|PARTICIPANTS?|MEMBERS? PRESENT|PRESENT)\*{0,2}\s*[:\-]\s*(.*?)' + NS, text)
-        duration     = extract_section(r'(?:^|\n)\*{0,2}(?:DURATION|MEETING DURATION|TOTAL DURATION|LENGTH)\*{0,2}\s*[:\-]\s*([^\n*]+)', text)
+        duration     = (
+            explicit_duration
+            or extract_section(r'(?:^|\n)\*{0,2}(?:DURATION|MEETING DURATION|TOTAL DURATION|LENGTH)\*{0,2}\s*[:\-]\s*([^\n*]+)', text)
+        )
 
         if not duration:
             dur_m = re.search(r'(?:meeting lasted|duration of|ran for|total time)[:\s]+([^\n\.]+)', text, re.IGNORECASE)
             duration = dur_m.group(1).strip() if dur_m else ''
+
+        logger.info(f"[template] resolved meeting_date={meeting_date!r} meeting_time={meeting_time!r} duration={duration!r}")
 
         agenda_items = extract_list(r'\*{0,2}(?:\d+\.\s*)?(?:AGENDA\s*/?\s*)?TOPICS?\s*DISCUSSED?\*{0,2}\s*[:\-]?\s*(.*?)' + NS, text)
         if not agenda_items:

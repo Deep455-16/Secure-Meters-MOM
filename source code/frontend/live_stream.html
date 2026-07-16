@@ -1074,14 +1074,17 @@
     const WS_URL    = `${WS_BASE}/ws`;
 
     /* ── State ──────────────────────────────────────────────────────── */
-    let isRecording   = false;
-    let transcript    = '';
-    let momText       = '';
-    let timerInterval = null;
-    let elapsedSecs   = 0;
-    let eventSource   = null;
-    let wsClient      = null;
-    let streamMode    = 'sse';   // 'sse' | 'ws'
+    let isRecording       = false;
+    let transcript        = '';
+    let momText           = '';
+    let timerInterval     = null;
+    let elapsedSecs       = 0;
+    let eventSource       = null;
+    let wsClient          = null;
+    let streamMode        = 'sse';   // 'sse' | 'ws'
+    let lastSessionDuration = '';    // stores duration from last recording session
+    let meetingStartDate    = '';    // date when recording started (for template)
+    let meetingStartTime    = '';    // time when recording started (for template)
 
     /* ── DOM refs ───────────────────────────────────────────────────── */
     const recordBtn          = document.getElementById('record-btn');
@@ -1404,6 +1407,10 @@
         recordBtn.setAttribute('aria-label', 'Stop recording');
         langSelect.disabled = true;
         setStatus('Recording', 'active');
+        // Capture the recording start date & time for the DOCX template
+        const _recordStart   = new Date();
+        meetingStartDate = _recordStart.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+        meetingStartTime = _recordStart.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
         startTimer();
         setLastAction('Recording started');
         showToast('Recording started!', 'success');
@@ -1425,7 +1432,9 @@
         if (socket) socket.emit('stop_stream');
         
         const duration = timerDisplay.textContent;
+        lastSessionDuration = duration;  // store for template export
         stopTimer();
+
         
         const el = document.getElementById('liveTranscript');
         if (el) el.innerHTML += "\n\n[Stream ended. Generating Final MOM...]\n";
@@ -1531,11 +1540,24 @@
       setLastAction('Exporting DOCX…');
 
       try {
+        // Collect meeting metadata to embed in the DOCX template header
+        // Use recording START time (captured when record began), not export click time
+        const _exportNow  = new Date();
+        const meetingDate = meetingStartDate || _exportNow.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+        const meetingTime = meetingStartTime || _exportNow.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const meetingDuration = lastSessionDuration || (timerDisplay ? timerDisplay.textContent : '');
+
         const res = await fetch(`${API_BASE}/api/v1/export/template`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ text: momText })
+          body:    JSON.stringify({
+            text:         momText,
+            meeting_date: meetingDate,
+            meeting_time: meetingTime,
+            duration:     meetingDuration
+          })
         });
+
 
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));

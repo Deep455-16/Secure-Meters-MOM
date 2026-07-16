@@ -18,7 +18,16 @@ You only need to do this the very first time you download the application.
         └── 📁 Installation-Windows
               └── ▶️  setup.bat   ← Double-click this ONCE
 ```
-A black terminal window will open. **Wait for it to finish.** It will automatically install Python, the Ollama AI engine, and download the necessary AI models (approx. 6 GB).
+A black terminal window will open. **Wait for it to finish.** It will automatically install Python, the Ollama AI engine, and download the necessary AI models (approx. 6 GB). The offline based Ollama AI model Download can sometimes take more time for less configuration PC in such case manually install the models by the following commands:-
+
+Let the installation continue on the specific terminal ,write the following commands on another terminal window after successfull ollama installation only.
+
+1. ollama --version  (For checking the current version of downloaded Ollama model)
+2. ollama pull qwen2.5:1.5b  (for downloading the Chunking Model)
+3. ollama pull qwen2.5:7b  (for downloading the Refinement Model)
+4. ollama list  (After successfull download of the Ollama Models check whether they are downloaded successfully or not)
+5. ollama serve  (to check whether the server is started or not once you click on START_APP file after successfull installation)
+
 *Note: This can take 15–25 minutes depending on your internet speed. Grab a coffee!*
 
 **For macOS:**

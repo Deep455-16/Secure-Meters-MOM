@@ -299,7 +299,7 @@ To bypass the automatic startup scripts or troubleshoot:
 - The app is intended to be reached only at `127.0.0.1` (your own machine).
 - Internet access is needed only during **installation** and optional **model updates**.
 
-For the full policy, hardening checklist and how to report a vulnerability, see **[SECURITY.md](SECURITY.md)**.
+For the full policy, hardening checklist and how to report a vulnerability, see **[Security.md](Security.md)**.
 
 ---
 
